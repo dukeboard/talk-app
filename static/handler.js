@@ -61,7 +61,23 @@ exports.openModel = function(window,filePath){
   }
   this.globalSlideModel = slides;
   var newHtmlModel = this.renderSlides();
+  window.setRepresentedFilename(filePath);
   window.webContents.send('newSlideModel',newHtmlModel);
+}
+
+exports.saveModel = function(window,callback){
+  if(this.openedPath){
+    var pdfPath = this.openedPath.replace('.talk','.pdf');
+    window.webContents.printToPDF({marginsType: 0}, function(error, data) {
+      if (error) throw error;
+      fs.writeFile(pdfPath, data, function(error) {
+        if (error){
+          throw error;
+        }
+        callback();
+      });
+    });
+  }
 }
 
 exports.renderSlide = function(index){

@@ -8,13 +8,15 @@
 	<link rel="stylesheet" href="./static/shower/themes/kevoree/styles/screen.css">
   <link rel="stylesheet" href="./static/highlight.js/styles/tomorrow.css">
   <script src="./static/shower/shower.js"></script>
+  <script src="./static/mousetrap.min.js"></script>
   <script>
     var ipc = require('ipc');
     ipc.on('newSlideModel', function(content) {
       document.getElementById('allSlides').innerHTML = content;
       shower.init();
-      console.log(shower);
     });
+    Mousetrap.bind('f', function() { ipc.send('toggleFullScreen'); });
+    Mousetrap.bind('o', function() { ipc.send('showOpen'); });
   </script>
 </head>
 <body class="list">
@@ -26,7 +28,13 @@
 	</header>
 -->
   <div id="allSlides">
-    Open a talk file...
+    <ul>
+      <li class="kevOrange">type <strong style="color:white;">o</strong> to open a file</li>
+      <li class="kevOrange">type <strong style="color:white;">f</strong> to toggle fullscreen</li>
+      <li class="kevOrange">type <strong style="color:white;">e</strong> to edit current slide</li>
+      <li class="kevOrange">type <strong style="color:white;">left</strong> and <strong style="color:white;">right</strong> to navigate</li>
+      <li class="kevOrange">type <strong style="color:white;">esc</strong> to change from list to slide mode</li>
+    </ul>
   </div>
 	<div class="progress"><div></div></div>
 </body>

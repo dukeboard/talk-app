@@ -14,9 +14,11 @@
 > Citation about the important goal!
 
 [slide]
-<h2>Plain HTML can be used as well<h2/>
+<h2>Plain HTML can be used as well!<h2/>
 
-<img src="$ROOT/images/dog_stream.png" style="width:50%;" />[slide]
+<img src="$ROOT/images/dog_stream.png" style="width:50%;" />
+
+[slide]
 ## Mixed markdown and HTML
 <ul>
 		<li>Point 1</li>

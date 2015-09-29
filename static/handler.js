@@ -115,49 +115,54 @@ exports.initModel = function(window){
 }
 
 exports.openModel = function(window,filePath){
-  //window.setRepresentedFilename(filePath);
   this.openedPath = filePath;
   this.openedDir = path.dirname(filePath);
-  var payload = fs.readFileSync(filePath,'utf-8');
-  var lines = payload.split('\n');
-  var slideObj = {};
-  var slides = [];
-  for(var i=0;i<lines.length;i++){
-    if(lines[i].trim().indexOf(this.coverDeclaration) == 0){
-      if(slideObj.content != undefined){
-        slides.push(slideObj);
-      }
-      slideObj = {content:'',style:'cover'}
-    } else if(lines[i].trim().indexOf(this.shoutDeclaration) == 0){
-      if(slideObj.content != undefined){
-        slides.push(slideObj);
-      }
-      slideObj = {content:'',style:'shout'}
-    } else if(lines[i].trim().indexOf(this.slideDeclaration) == 0){
-      if(slideObj.content != undefined){
-        slides.push(slideObj);
-      }
-      slideObj = {content:''}
-    } else {
-      if(slideObj.content != undefined){
-        slideObj.content += lines[i]+'\n';
+  var self = this;
+  //window.setRepresentedFilename(filePath);
+  var callback = function(curr, prev){
+    var payload = fs.readFileSync(filePath,'utf-8');
+    var lines = payload.split('\n');
+    var slideObj = {};
+    var slides = [];
+    for(var i=0;i<lines.length;i++){
+      if(lines[i].trim().indexOf(self.coverDeclaration) == 0){
+        if(slideObj.content != undefined){
+          slides.push(slideObj);
+        }
+        slideObj = {content:'',style:'cover'}
+      } else if(lines[i].trim().indexOf(self.shoutDeclaration) == 0){
+        if(slideObj.content != undefined){
+          slides.push(slideObj);
+        }
+        slideObj = {content:'',style:'shout'}
+      } else if(lines[i].trim().indexOf(self.slideDeclaration) == 0){
+        if(slideObj.content != undefined){
+          slides.push(slideObj);
+        }
+        slideObj = {content:''}
+      } else {
+        if(slideObj.content != undefined){
+          slideObj.content += lines[i]+'\n';
+        }
       }
     }
-  }
-  if(slideObj.content != undefined){
-    slides.push(slideObj);
-  }
-  //render markdown
-  for(var i=0;i<slides.length;i++){
-    if(slides[i].content != undefined){
-      slides[i].raw = slides[i].content;
-      slides[i].content = marked(slides[i].content.replace('$ROOT',this.openedDir));
+    if(slideObj.content != undefined){
+      slides.push(slideObj);
     }
+    //render markdown
+    for(var i=0;i<slides.length;i++){
+      if(slides[i].content != undefined){
+        slides[i].raw = slides[i].content;
+        slides[i].content = marked(slides[i].content.replace('$ROOT',self.openedDir));
+      }
+    }
+    self.globalSlideModel = slides;
+    var newHtmlModel = self.renderSlides();
+    window.setRepresentedFilename(filePath);
+    window.webContents.send('slideModel',newHtmlModel);
   }
-  this.globalSlideModel = slides;
-  var newHtmlModel = this.renderSlides();
-  window.setRepresentedFilename(filePath);
-  window.webContents.send('slideModel',newHtmlModel);
+  fs.watchFile(filePath, callback);
+  callback(null,null);
 }
 
 exports.openedFile = function(){
@@ -190,11 +195,7 @@ exports.saveModel = function(window,targetFile){
         } else {
           flattedContent = flattedContent + this.slideDeclaration+'\n';
         }
-      //  if(i == this.globalSlideModel.length-1){
-      //    flattedContent = flattedContent + loopSlide.raw.trim();
-      //  } else {
-          flattedContent = flattedContent + loopSlide.raw.trim()+'\n\n';
-      //  }
+        flattedContent = flattedContent + loopSlide.raw.trim()+'\n\n';
       }
     }
     fs.writeFile(this.openedPath, flattedContent.slice(0,flattedContent.length-1), function(error) {

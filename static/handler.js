@@ -190,11 +190,11 @@ exports.saveModel = function(window,targetFile){
         } else {
           flattedContent = flattedContent + this.slideDeclaration+'\n';
         }
-        if(i == this.globalSlideModel.length-1){
-          flattedContent = flattedContent + loopSlide.raw;
-        } else {
-          flattedContent = flattedContent + loopSlide.raw;+'\n';
-        }
+      //  if(i == this.globalSlideModel.length-1){
+      //    flattedContent = flattedContent + loopSlide.raw.trim();
+      //  } else {
+          flattedContent = flattedContent + loopSlide.raw.trim()+'\n\n';
+      //  }
       }
     }
     fs.writeFile(this.openedPath, flattedContent.slice(0,flattedContent.length-1), function(error) {

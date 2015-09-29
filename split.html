@@ -24,45 +24,8 @@
     background: #333;
 	}
 
-  #dropzone {
-    position: relative;
-    border: 7px dotted #FFF;
-    border-radius: 20px;
-    color: white;
-    font: bold 24px/200px arial;
-    height: 200px;
-    margin: 30px auto;
-    text-align: center;
-    width: 200px;
-  }
-
-  #dropzone.hover {
-    border: 7px solid #DF9D00;
-    color: #DF9D00;
-  }
-
-  #dropzone.dropped {
-    background: #222;
-    border: 7px solid #444;
-  }
-
-  #dropzone div {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-  #dropzone [type="file"] {
-    cursor: pointer;
-    position: absolute;
-    opacity: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
+  #holder { border: 7px dashed #ccc; width: 300px; height: 300px; margin: 20px auto;}
+  #holder.hover { border: 7px dashed #DF9D00; }
 
   </style>
   <script>
@@ -155,12 +118,7 @@
 </head>
 <body>
   <iframe id="codeFrame" src="editor.html" frameborder="0"></iframe>
-  <div>
-    <div id="dropzone">
-      <div>Talk dropzone</div>
-      <input id="dropzoneFile" type="file" accept="talk" />
-    </div>
-  </div>
+  <div id="holder"></div>
 <!--
   <iframe id="rightFrame" frameborder="0"></iframe>
 -->
@@ -169,25 +127,23 @@
   <webview id="rightFrame" src="viewer.html" nodeintegration></webview>
   -->
 <script>
-var ipc = require('ipc');
-var dropZone = document.getElementById('dropzone');
-var dropZoneFile = document.getElementById('dropzoneFile');
-dropZone.addEventListener('dragover', function() {
-  dropZone.classList.add( "hover" );
-});
-dropZone.addEventListener('dragleave', function() {
-  dropZone.classList.remove('hover');
-});
-dropZoneFile.addEventListener('change', function(e) {
-    var file = this.files[0];
-    dropZone.classList.remove('hover');
-    var ext = file.name.split('.').pop();
+window.ondragover = function(e) { e.preventDefault(); return false };
+window.ondrop = function(e) { e.preventDefault(); return false };
+var holder = document.getElementById('holder');
+holder.ondragover = function () { this.className = 'hover'; return false; };
+holder.ondragleave = function () { this.className = ''; return false; };
+holder.ondrop = function (e) {
+  e.preventDefault();
+  for (var i = 0; i < e.dataTransfer.files.length; ++i) {
+    var ext = e.dataTransfer.files[i].name.split('.').pop();
     if(ext =='talk'){
-      dropZone.classList.add('dropped');
-      handler.openModel(mainWindow,file.path);
+      handler.openModel(mainWindow,e.dataTransfer.files[i].path);
       mainWindow.focus();
+      return false;
     }
-  });
+  }
+  return false;
+};
 </script>
 
 </body>

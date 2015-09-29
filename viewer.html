@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>Talk</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=792, user-scalable=no">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<link rel="stylesheet" href="./static/shower/themes/kevoree/styles/screen.css">
+  <link rel="stylesheet" href="./static/highlight.js/styles/tomorrow.css">
+</head>
+<body class="list">
+	<script>window.selectedSlideIndex = {{selected}};</script>
+
+	{{content}}
+
+	<div class="progress"><div></div></div>
+	<script>
+		/*
+	  function refreshView(content){
+			var selfShower = shower;
+			window.requestAnimationFrame(function(){
+				document.getElementById('allSlides').innerHTML = content;
+				shower.slideList = [];
+				shower.init().run();
+			});
+		}
+		*/
+		function forceSlideMode(){
+			if (shower.isSlideMode()){
+				shower.toggleMode();
+			}
+		}
+	  function getCurrentSlide(){
+			return shower.getCurrentSlideNumber();
+		}
+  </script>
+	<script src="./static/shower/shower.js"></script>
+</body>
+</html>

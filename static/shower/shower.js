@@ -14,7 +14,7 @@ window.shower = (function(window, document, undefined) {
 		slides = [],
 		progress = [],
 		timer,
-		isHistoryApiSupported = ! ! (window.history && window.history.pushState);
+		isHistoryApiSupported = false;// ! ! (window.history && window.history.pushState);
 
 	// Shower debug mode env, could be overridden before shower.init
 	shower.debugMode = false;
@@ -439,6 +439,8 @@ window.shower = (function(window, document, undefined) {
 			callback();
 		}
 
+		parent.notifySlideChange(slideNumber);
+
 		return slideNumber;
 	};
 
@@ -817,7 +819,7 @@ window.shower = (function(window, document, undefined) {
 
 			var next = shower._getSlideTitle(slideNumber + 1);
 			if (next) {
-				console.info('NEXT: ' + next);
+				//console.info('NEXT: ' + next);
 			}
 		}
 	};
@@ -867,6 +869,13 @@ window.shower = (function(window, document, undefined) {
 		shower.
 			init().
 			run();
+
+			if(window.selectedSlideIndex == undefined){
+				shower.go(0);
+			} else {
+				shower.go(window.selectedSlideIndex);
+			}
+
 	}, false);
 
 	window.addEventListener('popstate', function() {
@@ -898,9 +907,12 @@ window.shower = (function(window, document, undefined) {
 	}, false);
 
 	window.addEventListener('resize', function() {
-		if (shower.isSlideMode()) {
-			shower._applyTransform(shower._getTransform());
-		}
+			var selfShower = shower;
+			window.requestAnimationFrame(function(){
+				if (shower.isSlideMode()) {
+					selfShower._applyTransform(selfShower._getTransform());
+				}
+			});
 	}, false);
 
 	document.addEventListener('keydown', function(e) {

@@ -189,9 +189,9 @@ a {
   border-bottom: .1em solid;
   color: #4b86c2; }
 .slide b, .slide strong {
-  font-weight: 700; }
+  font-weight: 700; color: #DF9D00;}
 .slide i, .slide em {
-  font-style: italic; }
+  font-style: italic;font-weight: bold; color: #666; }
 .slide kbd, .slide code, .slide samp {
   padding: 3px 8px;
   border-radius: 8px;

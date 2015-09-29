@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+	<meta charset="UTF-8">
+	<title>Markdown Viewer</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+	<link rel='stylesheet' type='text/css' href='bower_components/open-sans-fontface/open-sans.css'>
+	<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  <style>
+  body{
+    background: #FFF;
+	}
+  #main-content2{
+    padding: 5px;
+  }
+  </style>
+  </head>
+  <body>
+	<section class="main-content2">
+		<textarea id="demo2"></textarea>
+	</section>
+	<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="simplemde.min.css">
+	<script src="simplemde.min.js"></script>
+	<script>
+	var simplemde = new SimpleMDE({
+		element: document.getElementById("demo2"),
+		spellChecker: true,
+      	status: false,
+     	toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link", "image", "|"]
+	});
+	simplemde.codemirror.setOption("fullScreen", true);
+	simplemde.codemirror.on("change", function(){
+    var currentValue = simplemde.value();
+		parent.notifySlideUpdate(currentValue);
+	});
+	function setContent(content){
+		simplemde.value(content);
+	}
+	</script>
+  </body>
+</html>

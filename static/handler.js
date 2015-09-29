@@ -1,7 +1,6 @@
 var fs = require('fs');
 var path = require('path');
 var hljs = require('./highlight.js/lib/index.js');
-//var cheerio = require('./cheerio/index.js');
 var marked = require('./marked/index.js');
 marked.setOptions({
   highlight: function (code, lang) {
@@ -114,12 +113,17 @@ exports.initModel = function(window){
   window.webContents.send('slideModel',newHtmlModel);
 }
 
+var previousWatcher = null;
+
 exports.openModel = function(window,filePath){
+  if(previousWatcher != null){
+    previousWatcher.close();
+  }
   this.openedPath = filePath;
   this.openedDir = path.dirname(filePath);
   var self = this;
   //window.setRepresentedFilename(filePath);
-  var callback = function(curr, prev){
+  var callback = function(event, filename){
     var payload = fs.readFileSync(filePath,'utf-8');
     var lines = payload.split('\n');
     var slideObj = {};
@@ -161,7 +165,7 @@ exports.openModel = function(window,filePath){
     window.setRepresentedFilename(filePath);
     window.webContents.send('slideModel',newHtmlModel);
   }
-  fs.watchFile(filePath, callback);
+  fs.watch(filePath, callback);
   callback(null,null);
 }
 

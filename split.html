@@ -35,14 +35,27 @@
     var self = this;
     var viewerPayload = fs.readFileSync('viewer.html','utf-8');
     function notifySlideUpdate(rawContent){
-        var viewerWindow = document.getElementById('rightFrame').contentWindow;
+      var viewerWindow = document.getElementById('rightFrame').contentWindow;
+      setTimeout(function(){
+        var csi = handler.getSelectedSlide();
+        if(csi != undefined && csi > -1){
+          var newPayload = handler.updateSlide(csi,rawContent);
+          var viewerDocument = document.getElementById('rightFrame').contentDocument;
+          var wrapper = viewerDocument.getElementById('slide_'+csi+'_wrap');
+          wrapper.innerHTML = newPayload;
+        }
+      },0);
+
+
+
+      /*
         var currentSlideId = viewerWindow.getCurrentSlide();
         if(currentSlideId > -1){
           var newPayload = handler.updateSlide(currentSlideId,rawContent);
           var viewerDocument = document.getElementById('rightFrame').contentDocument;
           var wrapper = viewerDocument.getElementById('slide_'+currentSlideId+'_wrap');
           wrapper.innerHTML = newPayload;
-        }
+        }*/
     }
     function notifySlideChange(currentSlideId){
       handler.setCurrentSelected(currentSlideId);
@@ -121,7 +134,7 @@
   </script>
 </head>
 <body>
-  <iframe id="codeFrame" src="editor.html" frameborder="0"></iframe>
+  <iframe id="codeFrame" src="static/editor/index.html" frameborder="0"></iframe>
 
   <div id="holder"></div>
 

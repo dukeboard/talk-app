@@ -1,11 +1,16 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
+var fs = require('fs');
 var handler = require('./static/handler.js');
 global.handler = handler;
 var Menu = require('menu');
 var mainWindow = null;
 var editMode = false;
+var viewerPayload = fs.readFileSync('viewer.html','utf-8');
+var showerJS = fs.readFileSync('static/shower/shower.js','utf-8');
+var showerCSS = fs.readFileSync('static/shower/themes/kevoree/styles/screen2.css','utf-8');
+
 app.on('window-all-closed', function() {
   //if (process.platform != 'darwin') {
     app.quit();
@@ -62,6 +67,24 @@ ipc.on('requestSlideModel',function(event){
              dialog.showSaveDialog(mainWindow,{ properties: [ 'saveFile'], filters: [{ name: 'TALK', extensions: ['talk'] }]},function(link){
                if(link){
                  handler.saveModel(mainWindow,link);
+               }
+             });
+           }
+         }
+       },
+       {
+         label: 'Generate HTML',
+         accelerator: 'Command+H',
+         click: function(){
+           if(handler.openedFile()){
+             var dynamicPayload = viewerPayload.replace('{{content}}',handler.renderSlides());
+             dynamicPayload = dynamicPayload.replace('{{selected}}',0);
+             dynamicPayload = dynamicPayload.replace('<script src="./static/shower/shower.js"></script>','<script>'+showerJS+'</script>');
+             dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="./static/shower/themes/kevoree/styles/screen.css">','<style>'+showerCSS+'</style>');
+             var htmlOutput = handler.openedFile().replace('.talk','.html');
+             fs.writeFile(htmlOutput, dynamicPayload, function(error) {
+               if (error){
+                 throw error;
                }
              });
            }

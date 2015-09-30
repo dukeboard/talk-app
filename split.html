@@ -72,21 +72,24 @@
       var rightFrame = document.getElementById('rightFrame');
       if(rightFrame){
         var viewerWindow = document.getElementById('rightFrame').contentWindow;
-        var currentSlideId = viewerWindow.getCurrentSlide();
+        var currentSlideId = handler.getSelectedSlide();
         if(currentSlideId != -1){
           var payload = handler.slideRaw(currentSlideId);
-          var viewerWindow = document.getElementById('codeFrame').contentWindow;
-          viewerWindow.setContent(payload);
+          var viewerWindowCode = document.getElementById('codeFrame').contentWindow;
+          viewerWindowCode.setContent(payload);
         }
         self.isEditMode = !self.isEditMode;
         if(self.isEditMode){
+          viewerWindow.forceSlideMode();
           document.getElementById("codeFrame").style.width = "45%";
           document.getElementById("rightFrame").style.width = "55%";
           document.getElementById("codeFrame").focus();
+          window.dispatchEvent(new Event('resize'));
         } else {
           document.getElementById("codeFrame").style.width = "0";
           document.getElementById("rightFrame").style.width = "100%";
           document.getElementById("rightFrame").focus();
+          window.dispatchEvent(new Event('resize'));
         }
       }
     });

@@ -29,9 +29,12 @@
 		}
 		*/
 		function forceSlideMode(){
-			if (shower.isSlideMode()){
-				shower.toggleMode();
-			}
+			var selfShower = shower;
+			window.requestAnimationFrame(function(){
+				if (!selfShower.isSlideMode()){
+					selfShower.toggleMode();
+				}
+			});
 		}
 	  function getCurrentSlide(){
 			return shower.getCurrentSlideNumber();

@@ -49,7 +49,7 @@ Image can be inserted with markdown or html syntax
 <img src='$ROOT/image/img.png' style='width:100px;' />
 ```
 
-Nota bene, the **$ROOT** keyword allows to reference an image relatively to the place of saved .talk file. The best is then to create a directory for your presentation, save and .talk file and put images aside it.
+Nota bene, the **$ROOT** keyword allows to reference an image relatively to the place of saved .talk file. The best is then to create a directory for your presentation, save and `.talk` file and put images aside it. An example is better than a long speech so checkout the `example` directory of this repository to have a running starting project.
 
 ### Export as HTML
 

@@ -1,6 +1,7 @@
-<p align="center">![logo](megaphone2.png)
-# Talk: minimal standalone keynote software using HTML5 rendering and Markdown editing
-</p>
+
+-> ![logo](megaphone2.png) 
+# Talk: minimal standalone keynote software using HTML5 rendering and Markdown editing <-
+
 
 This application allows you to edit and present slides rendered in HTML5 than you can edit in markdown for simplicity. Developed as a standalone application, TalkApp allows to focus on content editing while offering a very flexible way to export slide in pure HTML in your website. The embedded chromium presentation engine using electron framework allows to have a consistent and constant rendering needed for professional presentation. The syntax is pure markdown, with ability to add pure HTML when needed.
 

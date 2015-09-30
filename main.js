@@ -7,9 +7,6 @@ global.handler = handler;
 var Menu = require('menu');
 var mainWindow = null;
 var editMode = false;
-var viewerPayload = fs.readFileSync('viewer.html','utf-8');
-var showerJS = fs.readFileSync('static/shower/shower.js','utf-8');
-var showerCSS = fs.readFileSync('static/shower/themes/kevoree/styles/screen2.css','utf-8');
 
 app.on('window-all-closed', function() {
   //if (process.platform != 'darwin') {
@@ -17,9 +14,10 @@ app.on('window-all-closed', function() {
   //}
 });
 app.on('ready', function() {
+
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.loadUrl('file://' + __dirname + '/split.html');
-  //mainWindow.openDevTools();
+//  mainWindow.openDevTools();
   global.mainWindow = mainWindow;
 
   mainWindow.on('closed', function() {
@@ -77,10 +75,17 @@ ipc.on('requestSlideModel',function(event){
          accelerator: 'Command+H',
          click: function(){
            if(handler.openedFile()){
+             var viewerPayload = fs.readFileSync(__dirname+'/viewer.html','utf-8');
+             var showerJS = fs.readFileSync(__dirname+'/static/shower/shower.js','utf-8');
+             var showerCSS = fs.readFileSync(__dirname+'/static/shower/themes/kevoree/styles/screenInline.css','utf-8');
+             var codeCSS = fs.readFileSync(__dirname+'/static/highlight.js/styles/tomorrow.css','utf-8');
+
              var dynamicPayload = viewerPayload.replace('{{content}}',handler.renderSlides());
              dynamicPayload = dynamicPayload.replace('{{selected}}',0);
              dynamicPayload = dynamicPayload.replace('<script src="./static/shower/shower.js"></script>','<script>'+showerJS+'</script>');
              dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="./static/shower/themes/kevoree/styles/screen.css">','<style>'+showerCSS+'</style>');
+             dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="./static/highlight.js/styles/tomorrow.css">','<style>'+codeCSS+'</style>');
+
              var htmlOutput = handler.openedFile().replace('.talk','.html');
              fs.writeFile(htmlOutput, dynamicPayload, function(error) {
                if (error){
@@ -90,6 +95,27 @@ ipc.on('requestSlideModel',function(event){
            }
          }
        },
+       /*
+       {
+         label: 'Generate PDF',
+         accelerator: 'Command+P',
+         click: function(){
+            if(handler.openedFile()){
+              mainWindow.print();
+              var pdfOutput = handler.openedFile().replace('.talk','.pdf');
+              mainWindow.printToPDF({landscape:true,marginType:0,printBackground:false,printSelectionOnly:false}, function (err, data) {
+                if (err) {
+                   console.error(err)
+                 }
+                 fs.writeFile(pdfOutput, data, function (err) {
+                   if (err) {
+                     console.error(err)
+                   }
+                 });
+               });
+            }
+         }
+       },*/
        {
          label: 'Quit',
          accelerator: 'Command+Q',

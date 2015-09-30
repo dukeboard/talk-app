@@ -23,8 +23,8 @@
 		margin: 0 0 0 0;
     background: #333;
 	}
-  #holder { border: 7px dashed #ccc; width: 300px; height: 300px; margin: 20px auto;}
-  #holder.hover { border: 7px dashed #DF9D00; }
+  #holder { border: 7px dashed #ccc; width: 300px; height: 300px; margin: 20px auto;border-radius:7px;}
+  #holder.hover { border: 7px dashed #DF9D00;border-radius:7px;}
   </style>
   <script>
     var handler = require('remote').getGlobal('handler');
@@ -33,7 +33,7 @@
     var fs = require('fs');
     var isEditMode = false;
     var self = this;
-    var viewerPayload = fs.readFileSync('viewer.html','utf-8');
+    var viewerPayload = fs.readFileSync(__dirname+'/viewer.html','utf-8');
     function notifySlideUpdate(rawContent){
       var viewerWindow = document.getElementById('rightFrame').contentWindow;
       setTimeout(function(){

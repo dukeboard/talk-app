@@ -176,6 +176,7 @@ exports.openedFile = function(){
 exports.saveModel = function(window,targetFile){
   if(targetFile != undefined && targetFile != null){
       this.openedPath = targetFile;
+      this.openedDir = path.dirname(filePath);
   }
   if(this.openedPath){
     /*var pdfPath = this.openedPath.replace('.talk','.pdf');

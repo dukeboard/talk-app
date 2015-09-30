@@ -40,8 +40,31 @@
 		simplemde.value(content);
 	}
 
-//  window.ondragover = function(e) { console.log(e); e.preventDefault(); return false };
-//	window.ondrop = function(e) { console.log(e); e.preventDefault(); return true };
+
+  var el = simplemde.codemirror.getWrapperElement();
+  el.addEventListener('paste', function(e) {
+      var clipboardData = e.clipboardData,items;
+      if (typeof clipboardData === "object") {
+        items = clipboardData.items || clipboardData.files || [];
+        console.log(JSON.stringify(items));
+        for (var i = 0; i < items.length; i++) {
+
+          var blob = items[i].getAsFile();
+                          window.URL = window.URL || window.webkitURL;
+                          var blobUrl = window.URL.createObjectURL(blob);
+                          c//onsole.log(blobUrl);
+
+          var item = items[i];
+          var itemFile = item.getAsFile();
+          //console.log(itemFile);
+        }
+      }
+    }, false);
+
+  simplemde.codemirror.on("drop",function(editor,e){
+    e.preventDefault();
+    //console.log('drop',e);
+  });
 
 	</script>
   </body>

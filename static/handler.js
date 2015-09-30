@@ -49,6 +49,7 @@ exports.addSlideBefore = function(window){
     this.globalSlideModel = newSlideModel;
     var newHtmlModel = this.renderSlides();
     window.webContents.send('slideModel',newHtmlModel);
+    window.setDocumentEdited(true);
   }
 }
 
@@ -70,6 +71,7 @@ exports.addSlideAfter = function(window){
     this.globalSlideModel = newSlideModel;
     var newHtmlModel = this.renderSlides();
     window.webContents.send('slideModel',newHtmlModel);
+    window.setDocumentEdited(true);
   }
 }
 
@@ -88,6 +90,7 @@ exports.deleteSlide = function(window){
     this.globalSlideModel = newSlideModel;
     var newHtmlModel = this.renderSlides();
     window.webContents.send('slideModel',newHtmlModel);
+    window.setDocumentEdited(true);
   }
 }
 
@@ -111,6 +114,7 @@ exports.initModel = function(window){
   var newHtmlModel = this.renderSlides();
   this.selectedSlide = 0;
   window.webContents.send('slideModel',newHtmlModel);
+  window.setDocumentEdited(true);
 }
 
 var previousWatcher = null;
@@ -121,6 +125,7 @@ exports.openModel = function(window,filePath){
   }
   this.openedPath = filePath;
   this.openedDir = path.dirname(filePath);
+  window.setRepresentedFilename(filePath);
   var self = this;
   //window.setRepresentedFilename(filePath);
   var callback = function(event, filename){
@@ -164,6 +169,7 @@ exports.openModel = function(window,filePath){
     var newHtmlModel = self.renderSlides();
     window.setRepresentedFilename(filePath);
     window.webContents.send('slideModel',newHtmlModel);
+    window.setDocumentEdited(false);
   }
   fs.watch(filePath, callback);
   callback(null,null);
@@ -177,6 +183,7 @@ exports.saveModel = function(window,targetFile){
   if(targetFile != undefined && targetFile != null){
       this.openedPath = targetFile;
       this.openedDir = path.dirname(targetFile);
+      window.setRepresentedFilename(targetFile);
   }
   if(this.openedPath){
     /*var pdfPath = this.openedPath.replace('.talk','.pdf');
@@ -206,6 +213,8 @@ exports.saveModel = function(window,targetFile){
     fs.writeFile(this.openedPath, flattedContent.slice(0,flattedContent.length-1), function(error) {
       if (error){
         throw error;
+      } else {
+        window.setDocumentEdited(false);
       }
     });
   }
@@ -229,6 +238,7 @@ exports.updateSlide = function(index,rawContent){
     var slideResolved = this.globalSlideModel[index];
     slideResolved.raw = rawContent;
     slideResolved.content = marked(rawContent.replace('$ROOT',this.openedDir));
+    window.setDocumentEdited(true);
     return slideResolved.content;
   }
 }

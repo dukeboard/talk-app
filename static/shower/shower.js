@@ -797,9 +797,9 @@ window.shower = (function(window, document, undefined) {
 	* Clear presenter notes in console (only for Slide Mode).
 	*/
 	shower.clearPresenterNotes = function() {
-		if (shower.isSlideMode() && console && console.clear && ! shower.debugMode) {
-			console.clear();
-		}
+		//if (shower.isSlideMode() && console && console.clear && ! shower.debugMode) {
+		//	console.clear();
+		//}
 	};
 
 	/**

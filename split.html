@@ -84,12 +84,12 @@
           document.getElementById("codeFrame").style.width = "45%";
           document.getElementById("rightFrame").style.width = "55%";
           document.getElementById("codeFrame").focus();
-          //window.dispatchEvent(new Event('resize'));
+          window.dispatchEvent(new Event('resize'));
         } else {
           document.getElementById("codeFrame").style.width = "0";
           document.getElementById("rightFrame").style.width = "100%";
           document.getElementById("rightFrame").focus();
-          //window.dispatchEvent(new Event('resize'));
+          window.dispatchEvent(new Event('resize'));
         }
       }
     });

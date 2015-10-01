@@ -167,7 +167,8 @@ exports.openModel = function(window,filePath){
     for(var i=0;i<slides.length;i++){
       if(slides[i].content != undefined){
         slides[i].raw = slides[i].content;
-        slides[i].content = marked(slides[i].content.replace('$ROOT',self.openedDir));
+        slides[i].content = marked(slides[i].content.split('$ROOT').join(self.openedDir));
+        //slides[i].content = marked(slides[i].content.replace('$ROOT',self.openedDir));
       }
     }
     self.globalSlideModel = slides;
@@ -243,7 +244,9 @@ exports.updateSlide = function(window,index,rawContent){
   if(index > -1){
     var slideResolved = this.globalSlideModel[index];
     slideResolved.raw = rawContent;
-    slideResolved.content = marked(rawContent.replace('$ROOT',this.openedDir));
+    //slideResolved.content = marked(rawContent.replace('$ROOT',this.openedDir));
+    slideResolved.content = marked(rawContent.split('$ROOT').join(this.openedDir));
+
     window.setDocumentEdited(true);
     return slideResolved.content;
   }

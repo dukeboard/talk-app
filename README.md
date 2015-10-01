@@ -51,6 +51,8 @@ Image can be inserted with markdown or html syntax
 
 Nota bene, the **$ROOT** keyword allows to reference an image relatively to the place of saved .talk file. The best is then to create a directory for your presentation, save and `.talk` file and put images aside it. An example is better than a long speech so checkout the `example` directory of this repository to have a running starting project.
 
+In addition users, can drop image and past image from OS clipboard directly into the left editor panel. In this case TalkApp will create automatically a copy of this image in a $ROOT/images/imported-DATE and insert the corresponding adress in the editor text. Of course this fonctionality ony work once the file as been saved or opened from somewhere.
+
 ### Export as HTML
 
 The presentation can be exported as a flat HTML file that can be embedded in any static web site. The only dependency to this HTML file is images included.

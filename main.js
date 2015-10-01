@@ -17,7 +17,7 @@ app.on('ready', function() {
 
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.loadUrl('file://' + __dirname + '/split.html');
-  mainWindow.openDevTools();
+  //mainWindow.openDevTools();
   global.mainWindow = mainWindow;
 
   mainWindow.on('closed', function() {

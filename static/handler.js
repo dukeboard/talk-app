@@ -31,6 +31,10 @@ exports.setCurrentSelected = function(index){
     this.selectedSlide = index;
 }
 
+exports.getCurrentDir = function(){
+  return this.openedDir;
+}
+
 exports.addSlideBefore = function(window){
   if(this.selectedSlide != undefined && this.selectedSlide != -1){
     var newSlideModel = [];
@@ -125,6 +129,7 @@ exports.openModel = function(window,filePath){
   }
   this.openedPath = filePath;
   this.openedDir = path.dirname(filePath);
+  window.setTitle("Talk : "+filePath);
   window.setRepresentedFilename(filePath);
   var self = this;
   //window.setRepresentedFilename(filePath);
@@ -184,6 +189,7 @@ exports.saveModel = function(window,targetFile){
       this.openedPath = targetFile;
       this.openedDir = path.dirname(targetFile);
       window.setRepresentedFilename(targetFile);
+      window.setTitle("Talk : "+targetFile);
   }
   if(this.openedPath){
     /*var pdfPath = this.openedPath.replace('.talk','.pdf');
@@ -233,7 +239,7 @@ exports.renderSlide = function(index){
   return '<section id="slide_'+index+'" class="'+classStyle+'"><div id="slide_'+index+'_wrap">'+slideResolved.content+'</div></section>';
 }
 
-exports.updateSlide = function(index,rawContent){
+exports.updateSlide = function(window,index,rawContent){
   if(index > -1){
     var slideResolved = this.globalSlideModel[index];
     slideResolved.raw = rawContent;

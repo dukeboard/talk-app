@@ -39,7 +39,7 @@
       setTimeout(function(){
         var csi = handler.getSelectedSlide();
         if(csi != undefined && csi > -1){
-          var newPayload = handler.updateSlide(csi,rawContent);
+          var newPayload = handler.updateSlide(mainWindow,csi,rawContent);
           var viewerDocument = document.getElementById('rightFrame').contentDocument;
           var wrapper = viewerDocument.getElementById('slide_'+csi+'_wrap');
           wrapper.innerHTML = newPayload;
@@ -84,17 +84,16 @@
           document.getElementById("codeFrame").style.width = "45%";
           document.getElementById("rightFrame").style.width = "55%";
           document.getElementById("codeFrame").focus();
-          window.dispatchEvent(new Event('resize'));
+          //window.dispatchEvent(new Event('resize'));
         } else {
           document.getElementById("codeFrame").style.width = "0";
           document.getElementById("rightFrame").style.width = "100%";
           document.getElementById("rightFrame").focus();
-          window.dispatchEvent(new Event('resize'));
+          //window.dispatchEvent(new Event('resize'));
         }
       }
     });
     ipc.on('slideModel', function(content) {
-
         var holder = document.getElementById('holder');
         if(holder){
           document.body.removeChild(holder);

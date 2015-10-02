@@ -104,6 +104,12 @@ exports.slideRaw = function(index){
   }
 }
 
+exports.slideType = function(index){
+  if(index <= this.globalSlideModel.length){
+    return this.globalSlideModel[index].style;
+  }
+}
+
 exports.slideModel = function(){
   return this.globalSlideModel;
 }
@@ -250,6 +256,12 @@ exports.updateSlide = function(window,index,rawContent){
     window.setDocumentEdited(true);
     return slideResolved.content;
   }
+}
+
+exports.updateSlideType = function(window,index,newType){
+  var slideResolved = this.globalSlideModel[index];
+  slideResolved.style = newType;
+  window.setDocumentEdited(true);
 }
 
 exports.renderSlides = function(){

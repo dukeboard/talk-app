@@ -21,6 +21,7 @@
 	<section class="main-content2">
 		<textarea id="demo2"></textarea>
 	</section>
+
 	<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="simplemde.min.css">
 	<script src="simplemde2.min.js"></script>
@@ -37,8 +38,42 @@
     var currentValue = simplemde.value();
 		parent.notifySlideUpdate(currentValue);
 	});
-	function setContent(content){
+
+  var toolBar = document.getElementsByClassName("editor-toolbar");
+  var divToolBar = toolBar[0];
+  var newSelector = document.createElement('div');
+  newSelector.style.width = "50px";
+  newSelector.id= "style.selector";
+  newSelector.style.display = "inline-block";
+  divToolBar.appendChild(newSelector);
+
+
+  var selectList = document.createElement("select");
+  var option = document.createElement("option");
+      option.value = "slide";
+      option.text = "default";
+      selectList.appendChild(option);
+  var option = document.createElement("option");
+    option.value = "shout"
+    option.text = "shout";
+    selectList.appendChild(option);
+  var option = document.createElement("option");
+    option.value = "cover";
+    option.text = "cover";
+    selectList.appendChild(option);
+  newSelector.appendChild(selectList);
+
+  selectList.onchange = function(e) {
+    parent.notifySlideTypeUpdate(selectList.value);
+  }
+
+	function setContent(content, type){
 		simplemde.value(content);
+    if(type != undefined){
+      selectList.value = type;
+    } else {
+      selectList.value = 'slide';
+    }
 	}
 
   var allowedTypes = [

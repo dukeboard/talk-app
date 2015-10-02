@@ -135,8 +135,10 @@ exports.openModel = function(window,filePath){
   }
   this.openedPath = filePath;
   this.openedDir = path.dirname(filePath);
-  window.setTitle("Talk : "+filePath);
-  window.setRepresentedFilename(filePath);
+  if(window != undefined){
+    window.setTitle("Talk : "+filePath);
+    window.setRepresentedFilename(filePath);
+  }
   var self = this;
   //window.setRepresentedFilename(filePath);
   var callback = function(event, filename){
@@ -195,8 +197,11 @@ exports.saveModel = function(window,targetFile){
   if(targetFile != undefined && targetFile != null){
       this.openedPath = targetFile;
       this.openedDir = path.dirname(targetFile);
-      window.setRepresentedFilename(targetFile);
-      window.setTitle("Talk : "+targetFile);
+      if(window != undefined){
+        window.setRepresentedFilename(targetFile);
+        window.setTitle("Talk : "+targetFile);
+      }
+
   }
   if(this.openedPath){
     /*var pdfPath = this.openedPath.replace('.talk','.pdf');

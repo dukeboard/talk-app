@@ -39,7 +39,19 @@ ipc.on('requestSlideModel',function(event){
          label: 'New',
          accelerator: 'Command+N',
          click: function() {
-           handler.initModel(mainWindow);
+           if(handler.edited()){
+             var choice = dialog.showMessageBox(mainWindow,{
+                             type: 'question',
+                             buttons: ['Yes', 'No'],
+                             title: 'Confirm',
+                             message: 'Current talk is unsaved! Are you sure to override by a new talk?'
+              });
+              if(choice === 0){
+                handler.initModel(mainWindow);
+              }
+           } else {
+             handler.initModel(mainWindow);
+           }
          }
        },
        {
@@ -160,7 +172,14 @@ ipc.on('requestSlideModel',function(event){
           label: 'Select All',
           accelerator: 'Command+A',
           selector: 'selectAll:'
-        },
+        }/*,
+        {
+          label: 'Find',
+          accelerator: 'Command+F',
+          click: function () {
+            //window.find();
+          }
+        }*/
       ]
     },
    {
@@ -214,7 +233,7 @@ ipc.on('requestSlideModel',function(event){
      submenu: [
        {
          label: 'Toggle Fullscreen',
-         accelerator: 'Command+F',
+         accelerator: 'Shift+Command+F',
          click: function() {
             mainWindow.setFullScreen(!mainWindow.isFullScreen());
          }

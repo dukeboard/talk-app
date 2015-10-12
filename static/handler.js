@@ -54,6 +54,7 @@ exports.addSlideBefore = function(window){
     var newHtmlModel = this.renderSlides();
     window.webContents.send('slideModel',newHtmlModel);
     window.setDocumentEdited(true);
+    this.isEdited = true;
   }
 }
 
@@ -76,6 +77,7 @@ exports.addSlideAfter = function(window){
     var newHtmlModel = this.renderSlides();
     window.webContents.send('slideModel',newHtmlModel);
     window.setDocumentEdited(true);
+    this.isEdited = true;
   }
 }
 
@@ -95,6 +97,7 @@ exports.deleteSlide = function(window){
     var newHtmlModel = this.renderSlides();
     window.webContents.send('slideModel',newHtmlModel);
     window.setDocumentEdited(true);
+    this.isEdited = true;
   }
 }
 
@@ -125,6 +128,11 @@ exports.initModel = function(window){
   this.selectedSlide = 0;
   window.webContents.send('slideModel',newHtmlModel);
   window.setDocumentEdited(true);
+  this.isEdited = true;
+}
+
+exports.edited = function(){
+  return this.isEdited != undefined && this.isEdited;
 }
 
 var previousWatcher = null;
@@ -175,8 +183,7 @@ exports.openModel = function(window,filePath){
     for(var i=0;i<slides.length;i++){
       if(slides[i].content != undefined){
         slides[i].raw = slides[i].content;
-
-        slides[i].content = marked(preprocess(rawContent,self.openedDir));
+        slides[i].content = marked(self.preprocess(slides[i].content,self.openedDir));
         //slides[i].content = marked(slides[i].content.replace('$ROOT',self.openedDir));
       }
     }
@@ -185,6 +192,7 @@ exports.openModel = function(window,filePath){
     window.setRepresentedFilename(filePath);
     window.webContents.send('slideModel',newHtmlModel);
     window.setDocumentEdited(false);
+    this.isEdited = false;
   }
   fs.watch(filePath, callback);
   callback(null,null);
@@ -234,6 +242,7 @@ exports.saveModel = function(window,targetFile){
         throw error;
       } else {
         window.setDocumentEdited(false);
+        this.isEdited = false;
       }
     });
   }
@@ -264,6 +273,7 @@ exports.updateSlide = function(window,index,rawContent){
     slideResolved.raw = rawContent;
     slideResolved.content = marked(this.preprocess(rawContent,this.openedDir));
     window.setDocumentEdited(true);
+    this.isEdited = true;
     return slideResolved.content;
   }
 }
@@ -272,6 +282,7 @@ exports.updateSlideType = function(window,index,newType){
   var slideResolved = this.globalSlideModel[index];
   slideResolved.style = newType;
   window.setDocumentEdited(true);
+  this.isEdited = true;
 }
 
 exports.renderSlides = function(){

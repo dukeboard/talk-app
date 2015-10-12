@@ -7,7 +7,7 @@ This application allows you to edit and present slides rendered in HTML5 than yo
 
 ## Download:
 
-Please have a look at the Release page of this repository: https://github.com/dukeboard/talk-app/releases 
+Please have a look at the Release page of this repository: https://github.com/dukeboard/talk-app/releases
 
 ## Features:
 - Fast!
@@ -35,10 +35,12 @@ Opened on editor mode...
 - **CMD+N**: New document
 - **CMD+O**: Open document
 - **CMD+E**: Toggle edit mode
-- **CMD+F**: Toggle fullscreen mode 
+- **Shift+CMD+F**: Toggle fullscreen mode
 - **CMD+S**: Save document
-- **CMD+UP**: Create a new slide above
-- **CMD+DOWN**: Create a new slide below
+- **CMD+UP**: Move slide up
+- **CMD+DOWN**: Move slide down
+- **Shift+CMD+UP**: Create a new slide above
+- **Shift+CMD+DOWN**: Create a new slide below
 
 ### On slides:
 - **Esc**: Toggle list or full-size mode

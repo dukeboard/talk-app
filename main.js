@@ -8,13 +8,12 @@ var Menu = require('menu');
 var mainWindow = null;
 var editMode = false;
 
-app.on('window-all-closed', function() {
+  app.on('window-all-closed', function() {
   //if (process.platform != 'darwin') {
     app.quit();
   //}
-});
-app.on('ready', function() {
-
+  });
+  app.on('ready', function() {
   mainWindow = new BrowserWindow({width: 1024, height: 768});
   mainWindow.loadUrl('file://' + __dirname + '/split.html');
   //mainWindow.openDevTools();
@@ -210,7 +209,15 @@ ipc.on('requestSlideModel',function(event){
                label: 'Delete Current Slide',
                accelerator: 'Command+BACKSPACE',
                click: function() {
-                 handler.deleteSlide(mainWindow);
+                 var choice = dialog.showMessageBox(mainWindow,{
+                                 type: 'question',
+                                 buttons: ['Yes', 'No'],
+                                 title: 'Confirm',
+                                 message: 'Are you sure to delete the selected slide?'
+                  });
+                  if(choice === 0){
+                    handler.deleteSlide(mainWindow);
+                  }
                }
              }
              /*,

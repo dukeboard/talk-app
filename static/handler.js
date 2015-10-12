@@ -175,7 +175,8 @@ exports.openModel = function(window,filePath){
     for(var i=0;i<slides.length;i++){
       if(slides[i].content != undefined){
         slides[i].raw = slides[i].content;
-        slides[i].content = marked(slides[i].content.split('$ROOT').join(self.openedDir));
+
+        slides[i].content = marked(preprocess(rawContent,self.openedDir));
         //slides[i].content = marked(slides[i].content.replace('$ROOT',self.openedDir));
       }
     }
@@ -251,13 +252,17 @@ exports.renderSlide = function(index){
   return '<section id="slide_'+index+'" class="'+classStyle+'"><div id="slide_'+index+'_wrap">'+slideResolved.content+'</div></section>';
 }
 
+exports.preprocess = function(raw,dir){
+  var res = raw.split('$ROOT').join(dir);
+  res = res.replace(new RegExp( ':fa-([-A-Za-z0-9]*):','g'),'<span class="kevOrange kevIcon fa fa-$1"></span>');
+  return res;
+}
+
 exports.updateSlide = function(window,index,rawContent){
   if(index > -1){
     var slideResolved = this.globalSlideModel[index];
     slideResolved.raw = rawContent;
-    //slideResolved.content = marked(rawContent.replace('$ROOT',this.openedDir));
-    slideResolved.content = marked(rawContent.split('$ROOT').join(this.openedDir));
-
+    slideResolved.content = marked(this.preprocess(rawContent,this.openedDir));
     window.setDocumentEdited(true);
     return slideResolved.content;
   }

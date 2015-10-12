@@ -15,16 +15,44 @@
   #main-content2{
     padding: 5px;
   }
+  .modalIcon {
+    color: #CCC;
+    margin: 5px;
+  }
+  .modalIcon:hover {
+    color: #DF9D00;
+    margin: 5px;
+  }
+  .modalContainer {
+        overflow: auto;
+  }
+  #btn-close-modal {
+                width:100%;
+                text-align: center;
+                cursor:pointer;
+                color:#fff;
+            }
   </style>
+  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="simplemde.min.css">
+	<script src="simplemde2.min.js"></script>
+  <script src="fa-icons.js"></script>
+  <link rel="stylesheet" href="animate.css" />
+
   </head>
   <body>
+    <script src="../jquery-2.1.4.min.js"></script>
+    <script src="modal/animatedModal.min.js"></script>
+
+    <div id="animatedModal">
+        <div class="close-animatedModal" id="btn-close-modal">CLOSE</div>
+        <div class="modal-content" id="modal-content-elem"></div>
+    </div>
+
 	<section class="main-content2">
 		<textarea id="demo2"></textarea>
 	</section>
 
-	<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
-	<link rel="stylesheet" href="simplemde.min.css">
-	<script src="simplemde2.min.js"></script>
 	<script>
   var self = this;
 	var simplemde = new SimpleMDE({
@@ -41,12 +69,37 @@
 
   var toolBar = document.getElementsByClassName("editor-toolbar");
   var divToolBar = toolBar[0];
+
   var newSelector = document.createElement('div');
   newSelector.style.width = "50px";
+  newSelector.style['margin-left'] = "5px";
   newSelector.id= "style.selector";
   newSelector.style.display = "inline-block";
-  divToolBar.appendChild(newSelector);
 
+  var fontSelector = document.createElement('a');
+  fontSelector.style.display = "inline-block";
+  fontSelector.innerHTML = '<span class="fa fa-plus-circle"></span>';
+  fontSelector.href='#animatedModal';
+  fontSelector.id='openModalBt';
+
+  var modalTxt = "<div class='modalContainer'>";
+  for(var i=0;i<faicons.length;i++){
+    modalTxt += '<a href="#" class="modalIconLink"><span style="font-size:25px;" class="modalIcon fa '+faicons[i]+'"></span></a>';
+  }
+  modalTxt += '</div>';
+  document.getElementById('modal-content-elem').innerHTML = modalTxt;
+
+  divToolBar.appendChild(fontSelector);
+  divToolBar.appendChild(newSelector);
+  $("#openModalBt").animatedModal({animatedIn:'bounceIn',animatedOut:'bounceOut'});
+  $(".modalIconLink").each(function(index,elem){
+    elem.onclick = function(cc){
+        var fontElemName = cc.srcElement.classList[2];
+        var editor = simplemde.codemirror;
+        editor.setValue( editor.getValue() + ":"+fontElemName+":");
+        $('.close-animatedModal').click();
+    };
+  });
 
   var selectList = document.createElement("select");
   var option = document.createElement("option");
@@ -63,9 +116,24 @@
     selectList.appendChild(option);
   newSelector.appendChild(selectList);
 
+/*
+  var selectFontList = document.createElement("select");
+  for(var i=0;i<faicons.length;i++){
+    var option = document.createElement("option");
+        option.value = faicons[i];
+        option.class = "fa fa-flag";
+        option.text = '<span class="fa '+faicons[i]+'"></span>';
+        selectFontList.appendChild(option);
+  }
+  fontSelector.appendChild(selectFontList);
+*/
   selectList.onchange = function(e) {
     parent.notifySlideTypeUpdate(selectList.value);
   }
+  /*
+  selectFontList.onchange = function(e) {
+    console.log("insert ",selectFontList.value);
+  }*/
 
 	function setContent(content, type){
 		simplemde.value(content);

@@ -15,7 +15,7 @@ app.on('window-all-closed', function() {
 });
 app.on('ready', function() {
 
-  mainWindow = new BrowserWindow({width: 800, height: 600});
+  mainWindow = new BrowserWindow({width: 1024, height: 768});
   mainWindow.loadUrl('file://' + __dirname + '/split.html');
   //mainWindow.openDevTools();
   global.mainWindow = mainWindow;

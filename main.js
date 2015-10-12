@@ -192,15 +192,29 @@ ipc.on('requestSlideModel',function(event){
                }
              },
              {
-               label: 'Add Slide Down',
+               label: 'Move Slide Up',
+               accelerator: 'Command+UP',
+               click: function() {
+                 handler.moveSlideUp(mainWindow);
+               }
+             },
+             {
+               label: 'Move Slide Down',
                accelerator: 'Command+DOWN',
+               click: function() {
+                 handler.moveSlideDown(mainWindow);
+               }
+             },
+             {
+               label: 'Add Slide Down',
+               accelerator: 'Shift+Command+DOWN',
                click: function() {
                  handler.addSlideAfter(mainWindow);
                }
              },
              {
                label: 'Add Slide Up',
-               accelerator: 'Command+UP',
+               accelerator: 'Shift+Command+UP',
                click: function() {
                  handler.addSlideBefore(mainWindow);
                }

@@ -58,6 +58,46 @@ exports.addSlideBefore = function(window){
   }
 }
 
+exports.moveSlideUp = function(window){
+  if(this.selectedSlide != undefined && this.selectedSlide != -1 && this.selectedSlide != 0){
+    var newSlideModel = [];
+    //copyAll
+    for(var i=0;i<this.globalSlideModel.length;i++){
+      newSlideModel.push(this.globalSlideModel[i]);
+    }
+    var currentSlideExtracted = this.globalSlideModel[this.selectedSlide];
+    var previousSlideExtracted = this.globalSlideModel[this.selectedSlide-1];
+    newSlideModel[this.selectedSlide] = previousSlideExtracted;
+    newSlideModel[this.selectedSlide-1] = currentSlideExtracted;
+    this.selectedSlide = this.selectedSlide -1;
+    this.globalSlideModel = newSlideModel;
+    var newHtmlModel = this.renderSlides();
+    window.webContents.send('slideModel',newHtmlModel);
+    window.setDocumentEdited(true);
+    this.isEdited = true;
+  }
+}
+
+exports.moveSlideDown = function(window){
+  if(this.selectedSlide != undefined && this.selectedSlide != -1 && this.selectedSlide != this.globalSlideModel.length-1){
+    var newSlideModel = [];
+    //copyAll
+    for(var i=0;i<this.globalSlideModel.length;i++){
+      newSlideModel.push(this.globalSlideModel[i]);
+    }
+    var currentSlideExtracted = this.globalSlideModel[this.selectedSlide];
+    var nextSlideExtracted = this.globalSlideModel[this.selectedSlide+1];
+    newSlideModel[this.selectedSlide] = nextSlideExtracted;
+    newSlideModel[this.selectedSlide+1] = currentSlideExtracted;
+    this.selectedSlide = this.selectedSlide + 1;
+    this.globalSlideModel = newSlideModel;
+    var newHtmlModel = this.renderSlides();
+    window.webContents.send('slideModel',newHtmlModel);
+    window.setDocumentEdited(true);
+    this.isEdited = true;
+  }
+}
+
 exports.addSlideAfter = function(window){
   if(this.selectedSlide != undefined && this.selectedSlide != -1){
     var newSlideModel = [];

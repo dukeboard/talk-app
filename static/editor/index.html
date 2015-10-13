@@ -32,6 +32,9 @@
                 cursor:pointer;
                 color:#fff;
             }
+    #btn-close-modal:hover {
+      background-color: #DF9D00;
+    }
   </style>
   <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="simplemde.min.css">
@@ -96,7 +99,7 @@
     elem.onclick = function(cc){
         var fontElemName = cc.srcElement.classList[2];
         var editor = simplemde.codemirror;
-        editor.setValue( editor.getValue() + ":"+fontElemName+":");
+        editor.replaceSelection(":"+fontElemName+":", "end");
         $('.close-animatedModal').click();
     };
   });
@@ -199,7 +202,9 @@
                       console.error(err);
                     } else {
                       var newContent = '<img src="$ROOT/'+remoteFilename+'" />';
-                      self.simplemde.codemirror.setValue(self.simplemde.codemirror.getValue() + "\n"+newContent+"\n");
+                      self.simplemde.codemirror.replaceSelection("\n"+newContent+"\n", "end");
+
+                      //self.simplemde.codemirror.setValue(self.simplemde.codemirror.getValue() + "\n"+newContent+"\n");
                     }
                   });
             }; // data url
@@ -235,7 +240,8 @@
                   console.error(err);
                 } else {
                   var newContent = '<img src="$ROOT/'+remoteFilename+'" />';
-                  self.simplemde.codemirror.setValue(self.simplemde.codemirror.getValue() + "\n"+newContent+"\n");
+                  self.simplemde.codemirror.replaceSelection("\n"+newContent+"\n", "end");
+                  //self.simplemde.codemirror.setValue(self.simplemde.codemirror.getValue() + "\n"+newContent+"\n");
                 }
               });
         }; // data url

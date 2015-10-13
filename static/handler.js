@@ -78,6 +78,12 @@ exports.moveSlideUp = function(window){
   }
 }
 
+var dialog = require('dialog');
+
+exports.showImportImageError = function(){
+  dialog.showErrorBox("Save your talk to a file first!", "Please save your talk to a file prior to insert images!");
+}
+
 exports.moveSlideDown = function(window){
   if(this.selectedSlide != undefined && this.selectedSlide != -1 && this.selectedSlide != this.globalSlideModel.length-1){
     var newSlideModel = [];

@@ -177,6 +177,7 @@
   el.addEventListener('paste', function(e) {
       e.preventDefault();
       if(parent.handler.getCurrentDir()==undefined){
+        parent.handler.showImportImageError();
         return;
       }
       var clipboardData = e.clipboardData,items;
@@ -217,6 +218,7 @@
   simplemde.codemirror.on("drop",function(editor,e){
     e.preventDefault();
     if(parent.handler.getCurrentDir()==undefined){
+      parent.handler.showImportImageError();
       return;
     }
     items = e.dataTransfer.items || e.dataTransfer.files || [];

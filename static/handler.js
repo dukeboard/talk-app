@@ -182,12 +182,12 @@ exports.edited = function(){
   return this.isEdited != undefined && this.isEdited;
 }
 
-var previousWatcher = null;
+//var previousWatcher = null;
 
 exports.openModel = function(window,filePath){
-  if(previousWatcher != null){
-    previousWatcher.close();
-  }
+  //if(previousWatcher != null){
+  //  previousWatcher.close();
+  //}
   this.openedPath = filePath;
   this.openedDir = path.dirname(filePath);
   if(window != undefined){
@@ -196,7 +196,7 @@ exports.openModel = function(window,filePath){
   }
   var self = this;
   //window.setRepresentedFilename(filePath);
-  var callback = function(event, filename){
+  //var callback = function(event, filename){
     var payload = fs.readFileSync(filePath,'utf-8');
     var lines = payload.split('\n');
     var slideObj = {};
@@ -240,9 +240,9 @@ exports.openModel = function(window,filePath){
     window.webContents.send('slideModel',newHtmlModel);
     window.setDocumentEdited(false);
     this.isEdited = false;
-  }
-  fs.watch(filePath, callback);
-  callback(null,null);
+  //}
+  //fs.watch(filePath, callback);
+  //callback(null,null);
 }
 
 exports.openedFile = function(){

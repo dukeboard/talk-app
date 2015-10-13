@@ -7,16 +7,36 @@ global.handler = handler;
 var Menu = require('menu');
 var mainWindow = null;
 var editMode = false;
-
+  var dialog = require('dialog');
   app.on('window-all-closed', function() {
-  //if (process.platform != 'darwin') {
-    app.quit();
-  //}
+    if(handler.edited()){
+      var choice = dialog.showMessageBox(mainWindow,{
+                      type: 'question',
+                      buttons: ['Save', 'Quit'],
+                      title: 'Confirm',
+                      message: 'Are your sure to quit without saving?'
+       });
+       if(choice === 0){
+         if(handler.openedFile()){
+           handler.saveModel(mainWindow,null,function(){});
+         } else {
+           dialog.showSaveDialog(mainWindow,{ properties: [ 'saveFile'], filters: [{ name: 'TALK', extensions: ['talk'] }]},function(link){
+             if(link){
+               handler.saveModel(mainWindow,link);
+             }
+           });
+         }
+       } else {
+         app.quit();
+       }
+    } else {
+      app.quit();
+    }
   });
   app.on('ready', function() {
   mainWindow = new BrowserWindow({width: 1024, height: 768});
   mainWindow.loadUrl('file://' + __dirname + '/split.html');
-  mainWindow.openDevTools();
+  //mainWindow.openDevTools();
   global.mainWindow = mainWindow;
 
   mainWindow.on('closed', function() {
@@ -29,7 +49,7 @@ ipc.on('requestSlideModel',function(event){
           event.sender.send('slideModel',null);
       }
 });
-  var dialog = require('dialog');
+
   var template = [
    {
      label: 'File',
@@ -131,7 +151,29 @@ ipc.on('requestSlideModel',function(event){
          label: 'Quit',
          accelerator: 'Command+Q',
          click: function(){
-           app.quit();
+           if(handler.edited()){
+             var choice = dialog.showMessageBox(mainWindow,{
+                             type: 'question',
+                             buttons: ['Save', 'Quit'],
+                             title: 'Confirm',
+                             message: 'Are your sure to quit without saving?'
+              });
+              if(choice === 0){
+                if(handler.openedFile()){
+                  handler.saveModel(mainWindow,null,function(){});
+                } else {
+                  dialog.showSaveDialog(mainWindow,{ properties: [ 'saveFile'], filters: [{ name: 'TALK', extensions: ['talk'] }]},function(link){
+                    if(link){
+                      handler.saveModel(mainWindow,link);
+                    }
+                  });
+                }
+              } else {
+                app.quit();
+              }
+           } else {
+             app.quit();
+           }
          }
        }
      ]
@@ -193,28 +235,28 @@ ipc.on('requestSlideModel',function(event){
              },
              {
                label: 'Move Slide Up',
-               accelerator: 'Command+UP',
+               accelerator: 'Command+LEFT',
                click: function() {
                  handler.moveSlideUp(mainWindow);
                }
              },
              {
                label: 'Move Slide Down',
-               accelerator: 'Command+DOWN',
+               accelerator: 'Command+RIGHT',
                click: function() {
                  handler.moveSlideDown(mainWindow);
                }
              },
              {
                label: 'Add Slide Up',
-               accelerator: 'Shift+Command+UP',
+               accelerator: 'Shift+Command+LEFT',
                click: function() {
                  handler.addSlideBefore(mainWindow);
                }
              },
              {
                label: 'Add Slide Down',
-               accelerator: 'Shift+Command+DOWN',
+               accelerator: 'Shift+Command+RIGHT',
                click: function() {
                  handler.addSlideAfter(mainWindow);
                }

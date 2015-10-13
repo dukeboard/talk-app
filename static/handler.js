@@ -108,6 +108,7 @@ exports.addSlideAfter = function(window){
   if(this.selectedSlide != undefined && this.selectedSlide != -1){
     var newSlideModel = [];
     var begin = this.globalSlideModel.slice(0,this.selectedSlide+1);
+    var end = this.globalSlideModel.slice(this.selectedSlide+1);
     for(var i=0;i<begin.length;i++){
       newSlideModel.push(begin[i]);
     }
@@ -115,7 +116,7 @@ exports.addSlideAfter = function(window){
     var newSlide = {raw: '## New Slide\n - your content here...\n'};
     newSlide.content = marked(newSlide.raw);
     newSlideModel.push(newSlide);
-    var end = this.globalSlideModel.slice(this.selectedSlide+1);
+
     for(var i=0;i<end.length;i++){
       newSlideModel.push(end[i]);
     }

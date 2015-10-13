@@ -16,7 +16,7 @@ var editMode = false;
   app.on('ready', function() {
   mainWindow = new BrowserWindow({width: 1024, height: 768});
   mainWindow.loadUrl('file://' + __dirname + '/split.html');
-  //mainWindow.openDevTools();
+  mainWindow.openDevTools();
   global.mainWindow = mainWindow;
 
   mainWindow.on('closed', function() {
@@ -206,17 +206,17 @@ ipc.on('requestSlideModel',function(event){
                }
              },
              {
-               label: 'Add Slide Down',
-               accelerator: 'Shift+Command+DOWN',
-               click: function() {
-                 handler.addSlideAfter(mainWindow);
-               }
-             },
-             {
                label: 'Add Slide Up',
                accelerator: 'Shift+Command+UP',
                click: function() {
                  handler.addSlideBefore(mainWindow);
+               }
+             },
+             {
+               label: 'Add Slide Down',
+               accelerator: 'Shift+Command+DOWN',
+               click: function() {
+                 handler.addSlideAfter(mainWindow);
                }
              },
              {

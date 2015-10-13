@@ -29,6 +29,17 @@
   <script>
     var handler = require('remote').getGlobal('handler');
     var mainWindow = require('remote').getGlobal('mainWindow');
+
+    window.addEventListener('beforeunload', function(ev) {
+      if (handler.edited()) {
+          if (handler.edited()) {
+             console.log("ForbidToClose!");
+              ipc.send("window-close-click");
+              ev.returnValue = 'false';
+          }
+      }
+    });
+
     var ipc = require('ipc');
     var fs = require('fs');
     var isEditMode = false;

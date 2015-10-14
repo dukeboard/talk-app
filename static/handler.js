@@ -193,8 +193,7 @@ exports.openModel = function(window,filePath){
     window.setTitle("Talk : "+filePath);
     window.setRepresentedFilename(filePath);
   }
-  var self = this;
-
+    var self = this;
     var payload = fs.readFileSync(filePath,'utf-8');
     var lines = payload.split('\n');
     var slideObj = {};
@@ -245,6 +244,7 @@ exports.openedFile = function(){
 }
 
 exports.saveModel = function(window,targetFile){
+  var self = this;
   if(targetFile != undefined && targetFile != null){
       this.openedPath = targetFile;
       this.openedDir = path.dirname(targetFile);
@@ -252,19 +252,8 @@ exports.saveModel = function(window,targetFile){
         window.setRepresentedFilename(targetFile);
         window.setTitle("Talk : "+targetFile);
       }
-
   }
   if(this.openedPath){
-    /*var pdfPath = this.openedPath.replace('.talk','.pdf');
-    window.webContents.printToPDF({marginsType: 0}, function(error, data) {
-      if (error) throw error;
-      fs.writeFile(pdfPath, data, function(error) {
-        if (error){
-          throw error;
-        }
-        callback();
-      });
-    });*/
     var flattedContent = '';
     if(this.globalSlideModel){
       for(var i=0;i<this.globalSlideModel.length;i++){
@@ -284,7 +273,7 @@ exports.saveModel = function(window,targetFile){
         throw error;
       } else {
         window.setDocumentEdited(false);
-        this.isEdited = false;
+        self.isEdited = false;
       }
     });
   }

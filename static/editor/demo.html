@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+	<meta charset="UTF-8">
+	<title>SimpleMDE Markdown Editor by NextStepWebs</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+	
+	<style>
+	.editor-preview h1,
+	.editor-preview h2,
+	.editor-preview h3,
+	.editor-preview h4,
+	.editor-preview h5{
+		margin-bottom:10px;
+	}
+	
+	.editor-preview h1{
+		border-bottom:1px solid #ddd;
+	}
+	
+	.editor-preview h1{
+		border-bottom:1px solid #eee;
+	}
+	</style>
+  </head>
+  <body>
+
+	<section class="main-content">
+
+
+<textarea id="demo3"># This one is bare
+You can also choose to hide the statusbar and/or toolbar for a simple and clean appearance. This one also checks for misspelled words as you type!</textarea>
+
+	</section>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+	<link rel="stylesheet" href="simplemde.min.css">
+	<script src="simplemde2.min.js"></script>
+	
+	<script>
+	new SimpleMDE({
+		element: document.getElementById("demo3"),
+		status: false,
+		toolbar: false,
+	});
+	</script>
+	
+  </body>
+</html>

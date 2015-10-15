@@ -62,7 +62,3 @@ In addition users, can drop image and past image from OS clipboard directly into
 ### Export as HTML
 
 The presentation can be exported as a flat HTML file that can be embedded in any static web site. The only dependency to this HTML file is images included.
-
-# State
-
-*beta*, actually all functionalities are working but some fuzzy refresh problem can occur. A simple app resize solve it temporary. More to come...

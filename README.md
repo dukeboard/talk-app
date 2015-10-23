@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="megaphone2.png" />
+	<img src="icon.png" />
 	<h1>Talk: minimal standalone keynote software using HTML5 rendering and Markdown editing</h1>
 </p>
 

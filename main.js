@@ -3,7 +3,7 @@ var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
 var fs = require('fs');
 var path = require('path');
-var handler = require('./static/handler.js');
+var handler = require('./model/handler.js');
 global.handler = handler;
 var Menu = require('menu');
 var mainWindow = null;
@@ -17,8 +17,8 @@ app.on('ready', function() {
     width: 1024,
     height: 768
   });
-  mainWindow.loadUrl('file://' + __dirname + '/split.html');
-  //mainWindow.openDevTools();
+  mainWindow.loadUrl('file://' + __dirname + '/main.html');
+  mainWindow.openDevTools();
   global.mainWindow = mainWindow;
 
   mainWindow.on('closed', function() {
@@ -135,18 +135,18 @@ app.on('ready', function() {
         accelerator: 'Command+H',
         click: function() {
           if (handler.openedFile()) {
-            var viewerPayload = fs.readFileSync(__dirname + '/viewer.html', 'utf-8');
-            var showerJS = fs.readFileSync(__dirname + '/static/shower/shower.js', 'utf-8');
-            var showerCSS = fs.readFileSync(__dirname + '/static/shower/themes/kevoree/styles/screenInline.css', 'utf-8');
-            var codeCSS = fs.readFileSync(__dirname + '/static/highlight.js/styles/tomorrow.css', 'utf-8');
-            var iconCSS = fs.readFileSync(__dirname + '/static/font-awesome-4.4.0/css/font-awesome.inline.css', 'utf-8');
+            var viewerPayload = fs.readFileSync(__dirname + '/viewer/viewer.html', 'utf-8');
+            var showerJS = fs.readFileSync(__dirname + '/viewer/shower/shower.js', 'utf-8');
+            var showerCSS = fs.readFileSync(__dirname + '/viewer/shower/themes/kevoree/styles/screenInline.css', 'utf-8');
+            var codeCSS = fs.readFileSync(__dirname + '/viewer/highlight.js/styles/tomorrow.css', 'utf-8');
+            var iconCSS = fs.readFileSync(__dirname + '/viewer/font-awesome-4.4.0/css/font-awesome.inline.css', 'utf-8');
             var dynamicPayload = viewerPayload.replace('{{content}}', handler.renderSlides());
             dynamicPayload = dynamicPayload.split(path.dirname(handler.openedFile())+"/").join('');
             dynamicPayload = dynamicPayload.replace('{{selected}}', 0);
-            dynamicPayload = dynamicPayload.replace('<script src="./static/shower/shower.js"></script>', '<script>' + showerJS + '</script>');
-            dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="./static/shower/themes/kevoree/styles/screen.css">', '<style>' + showerCSS + '</style>');
-            dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="./static/highlight.js/styles/tomorrow.css">', '<style>' + codeCSS + '</style>');
-            dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="./static/font-awesome-4.4.0/css/font-awesome.min.css">', '<style>' + iconCSS + '</style>');
+            dynamicPayload = dynamicPayload.replace('<script src="viewer/shower/shower.js"></script>', '<script>' + showerJS + '</script>');
+            dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="viewer/shower/themes/kevoree/styles/screen.css">', '<style>' + showerCSS + '</style>');
+            dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="viewer/highlight.js/styles/tomorrow.css">', '<style>' + codeCSS + '</style>');
+            dynamicPayload = dynamicPayload.replace('<link rel="stylesheet" href="viewer/font-awesome-4.4.0/css/font-awesome.min.css">', '<style>' + iconCSS + '</style>');
             var htmlOutput = handler.openedFile().replace('.talk', '.html');
             fs.writeFile(htmlOutput, dynamicPayload, function(error) {
               if (error) {

@@ -62,3 +62,6 @@ In addition users, can drop image and past image from OS clipboard directly into
 ### Export as HTML
 
 The presentation can be exported as a flat HTML file that can be embedded in any static web site. The only dependency to this HTML file is images included.
+
+## Credits
+The HTML rendering engine is derived from the excellent work of https://github.com/shower/shower

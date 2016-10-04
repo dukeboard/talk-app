@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Talk-app</title>
+    <style type="text/css">
+      #editor {
+        width:100%;
+        height:100%;
+      }
+    </style>
+    <script>window.$ = window.jQuery = require('jquery');</script>
+    <script src="node_modules/golden-layout/dist/goldenlayout.js"></script>
+		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-base.css" />
+		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-light-theme.css" />
+</head>
+<body>
+	<script>
+		var remote = require('electron');
+		var path = require('path');
+	</script>
+	<script src="node_modules/monaco-editor/min/vs/loader.js"></script>
+	<script>
+		function uriFromPath(_path) {
+			var pathName = path.resolve(_path).replace(/\\/g, '/');
+			if (pathName.length > 0 && pathName.charAt(0) !== '/') {
+				pathName = '/' + pathName;
+			}
+			return encodeURI('file://' + pathName);
+		}
+		require.config({
+			baseUrl: uriFromPath(path.join(__dirname, 'node_modules/monaco-editor/min'))
+		});
+		self.module = undefined;
+		self.process.browser = true;
+	</script>
+  <script>
+  var config = {
+      content: [{
+          type: 'row',
+        content:[{
+              type: 'row',
+              content:[{
+									title:"editor",
+                  type: 'component',
+                  componentName: 'editorPanel',
+									showCloseIcon: false,
+									showMaximiseIcon: false,
+									showPopoutIcon: false
+              },{
+									title:"viewer",
+                  type: 'component',
+                  componentName: 'viewerPanel',
+									showCloseIcon: false,
+									showMaximiseIcon: false,
+									showPopoutIcon: false
+              }]
+          }]
+      }]
+  };
+  var myLayout = new GoldenLayout( config );
+  myLayout.registerComponent( 'viewerPanel', function(container){});
+  myLayout.registerComponent( 'editorPanel', function(container){
+		require(['vs/editor/editor.main'], function() {
+			var editorDiv = document.createElement('div');
+			editorDiv.id = 'editor';
+			container.getElement().append(editorDiv);
+			var editor = monaco.editor.create(editorDiv, {
+				value: [
+					'# Hello',
+					'world'
+				].join('\n'),
+				language: 'markdown'
+			});
+			container.on('resize',function(){
+				editor.layout();
+			});
+			remote.ipcRenderer.on('file-contents',function(event,arg){
+				editor.setValue(arg);
+			});
+			remote.ipcRenderer.on('req-save',function(event,arg){
+				arg.content = editor.getValue();
+				remote.ipcRenderer.send('resp-save',arg);
+			});
+		});
+	});
+  myLayout.init();
+  </script>
+	</body>
+</html>

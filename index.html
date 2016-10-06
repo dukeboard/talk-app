@@ -2,35 +2,32 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Talk-app</title>
+		<title>unamed | Talk-app</title>
     <style type="text/css">
       #editor {
         width:100%;
         height:100%;
       }
     </style>
-    <script>window.$ = window.jQuery = require('jquery');</script>
-    <script src="node_modules/golden-layout/dist/goldenlayout.js"></script>
+		<script src="jquery.js"></script>
+    <script src="goldenlayout.js"></script>
+		<script src="node_modules/markdown-it/dist/markdown-it.js"></script>
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-base.css" />
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-light-theme.css" />
+		<link type="text/css" rel="stylesheet" href="shower/themes/talk/styles/screen-4x3.css" />
 </head>
 <body>
 	<script>
+		var md = new window.markdownit({html:true,xhtmlOut:true});
+		function hr_section(tokens, idx, options, env, self) {
+		  return '</section><section class=\"slide\">';
+		};
+		md.renderer.rules['hr'] = hr_section
 		var remote = require('electron');
 		var path = require('path');
 	</script>
 	<script src="node_modules/monaco-editor/min/vs/loader.js"></script>
 	<script>
-		function uriFromPath(_path) {
-			var pathName = path.resolve(_path).replace(/\\/g, '/');
-			if (pathName.length > 0 && pathName.charAt(0) !== '/') {
-				pathName = '/' + pathName;
-			}
-			return encodeURI('file://' + pathName);
-		}
-		require.config({
-			baseUrl: uriFromPath(path.join(__dirname, 'node_modules/monaco-editor/min'))
-		});
 		self.module = undefined;
 		self.process.browser = true;
 	</script>
@@ -43,10 +40,11 @@
               content:[{
 									title:"editor",
                   type: 'component',
+									width: 55,
                   componentName: 'editorPanel',
 									showCloseIcon: false,
 									showMaximiseIcon: false,
-									showPopoutIcon: false
+									showPopoutIcon: false,
               },{
 									title:"viewer",
                   type: 'component',
@@ -59,8 +57,26 @@
       }]
   };
   var myLayout = new GoldenLayout( config );
-  myLayout.registerComponent( 'viewerPanel', function(container){});
+
+	var slideContainer = document.createElement('div');
+	slideContainer.id = 'slideContainer';
+  slideContainer.classList.add("shower");
+  slideContainer.classList.add("list");
+  myLayout.registerComponent( 'viewerPanel', function(container){
+		var bodyStyle = document.body.style;
+		bodyStyle.setProperty('--slideWidth', 1024);
+		bodyStyle.setProperty('--slideHeight', 768);
+		bodyStyle.setProperty('--slidePreviewWidth', container.getElement().width());
+		container.on('resize',function(){
+			bodyStyle.setProperty('--slidePreviewWidth', container.getElement().width());
+		});
+		container.getElement().append(slideContainer);
+		container.getElement().css("overflow","scroll");
+
+	});
+
   myLayout.registerComponent( 'editorPanel', function(container){
+		require.config({ paths: { 'vs': 'node_modules/monaco-editor/min/vs' }});
 		require(['vs/editor/editor.main'], function() {
 			var editorDiv = document.createElement('div');
 			editorDiv.id = 'editor';
@@ -82,6 +98,16 @@
 				arg.content = editor.getValue();
 				remote.ipcRenderer.send('resp-save',arg);
 			});
+			editor.onDidChangeModelContent(function(){
+				remote.ipcRenderer.send('edited');
+				var contentResult = md.render(editor.getValue());
+				var extResult = '<section class=\"slide\">'+contentResult+'</section>';
+				slideContainer.innerHTML = extResult;
+			});
+			var contentResult = md.render(editor.getValue());
+			var extResult = '<section class=\"slide\">'+contentResult+'</section>';
+			slideContainer.innerHTML = extResult;
+
 		});
 	});
   myLayout.init();

@@ -5,9 +5,15 @@ const BrowserWindow = electron.BrowserWindow;
 const dialog = electron.dialog;
 const fs = require('fs');
 const ipc = require('electron').ipcMain;
+const openport = require('openport');
+const http = require('http');
+const url = require('url');
+const path = require('path');
 
 var windows = [];
 var paths = [];
+var roots = [];
+var servers = [];
 
 function windowIndex(window){
 	for(var i=0;i<windows.length;i++){
@@ -17,24 +23,84 @@ function windowIndex(window){
 	}
 }
 
+const mimeType = {
+	'.ico': 'image/x-icon',
+	'.html': 'text/html',
+	'.js': 'text/javascript',
+	'.json': 'application/json',
+	'.css': 'text/css',
+	'.png': 'image/png',
+	'.jpg': 'image/jpeg',
+	'.wav': 'audio/wav',
+	'.mp3': 'audio/mpeg',
+	'.svg': 'image/svg+xml',
+	'.pdf': 'application/pdf',
+	'.doc': 'application/msword',
+	'.eot': 'appliaction/vnd.ms-fontobject',
+	'.ttf': 'aplication/font-sfnt'
+};
+
 function createWindow () {
-	var newWindow = new BrowserWindow({width: 800, height: 600,show: false,icon: 'icon.icns'});
-	windows.push(newWindow);
-	newWindow.loadURL(`file://${__dirname}/index.html`)
-	newWindow.webContents.openDevTools()
-	newWindow.on('closed', function () {
-		var winIndex = windowIndex(newWindow);
-		delete windows[winIndex];
-		delete paths[winIndex];
-	});
-	newWindow.once('ready-to-show', () => {
-	        newWindow.maximize();
-	        newWindow.show();
+	openport.find(function(err, port) {
+  	if(err) { console.log(err); return; }
+		var newWindow = new BrowserWindow({width: 800, height: 600,show: false,icon: 'icon.icns'});
+		windows.push(newWindow);
+		let index = windowIndex(newWindow);
+		function handleRequest(request, response){
+			const parsedUrl = url.parse(request.url);
+			let pathname = `.${parsedUrl.pathname}`;
+			const ext = path.parse(pathname).ext;
+			fs.readFile(`${__dirname}${request.url}`, function(err, data){
+				if(err){
+					var currentRoot = roots[index];
+					if(currentRoot){
+						fs.readFile(`${currentRoot}${request.url}`, function(err2, data2){
+							if(err2){
+								response.statusCode = 500;
+								response.end(`Error getting the file: ${err}.`);
+							} else {
+								response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
+								response.end(data2);
+							}
+						});
+					} else {
+						response.statusCode = 500;
+						response.end(`Error getting the file: ${err}.`);
+					}
+				} else {
+					response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
+					response.end(data);
+				}
+			});
+		}
+		var server = http.createServer(handleRequest);
+		servers[index] = server;
+		server.listen(port,'127.0.0.1', function(){
+			//newWindow.loadURL(`file://${__dirname}/index.html`)
+			newWindow.loadURL(`http://127.0.0.1:${port}/index.html`)
+		});
+		newWindow.webContents.openDevTools()
+		newWindow.on('closed', function () {
+			var winIndex = windowIndex(newWindow);
+			delete windows[winIndex];
+			delete paths[winIndex];
+			delete roots[winIndex];
+			servers[winIndex].close();
+			delete servers[winIndex];
+		});
+		newWindow.once('ready-to-show', () => {
+		        newWindow.maximize();
+		        newWindow.show();
+		});
 	});
 }
 
 ipc.on('resp-save', function(event, eventData) {
     writeFile(eventData.path, eventData.content,windows[eventData.index]);
+});
+
+ipc.on('edited',function(){
+	BrowserWindow.getFocusedWindow().setDocumentEdited(true);
 });
 
 app.on('activate', () => {
@@ -58,9 +124,9 @@ app.on('window-all-closed', function () {
 })
 
 app.on('activate', function () {
-	//if (mainWindow === null) {
+	if(windows.length == 0){
 		createWindow()
-	//}
+	}
 })
 
 let menuTemplate = [{
@@ -85,6 +151,7 @@ let menuTemplate = [{
                     // extract the filename
                     var array = globalFilePath.split("/");
                     filename = array[array.length - 1];
+										roots[foundIndex] = globalFilePath.slice(0,globalFilePath.length - (filename.length+1));
 										focusedWindow.setTitle(filename + " | TalkApp");
                     readFile(files, (content) => {
                         focusedWindow.webContents.send('file-contents', content);
@@ -162,23 +229,6 @@ let menuTemplate = [{
 }, {
     label: 'View',
     submenu: [{
-        label: 'Reload',
-        accelerator: 'CmdOrCtrl+R',
-        click: function(item, focusedWindow) {
-            if (focusedWindow) {
-                // on reload, start fresh and close any old
-                // open secondary windows
-                if (focusedWindow.id === 1) {
-                    BrowserWindow.getAllWindows().forEach(function(win) {
-                        if (focusedWindow.id > 1) {
-                            focusedWindow.close();
-                        }
-                    });
-                }
-                focusedWindow.reload();
-            }
-        }
-    }, {
         label: 'Toggle Full Screen',
         accelerator: (function() {
             if (process.platform === 'darwin') {
@@ -279,6 +329,7 @@ function writeFile(filePath, contents, currentWindow) {
             if (err) {
                 error('danger', "<strong>Uh-Oh!</strong> There was an error saving the file.",currentWindow);
             }
+						currentWindow.setDocumentEdited(false);
         });
     }
 }
@@ -289,5 +340,5 @@ function error(type, message, currentWindow) {
         type: type,
         message: message
     };
-    currentWindow.webContents.send('error', data);
+    //currentWindow.webContents.send('error', data);
 }

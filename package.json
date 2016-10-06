@@ -6,10 +6,11 @@
     "electron-packager": "*"
   },
   "dependencies": {
-    "codemirror": "*",
     "jquery": "*",
     "remark":"*",
     "monaco-editor": "*",
-    "golden-layout": "*"
+    "golden-layout": "*",
+    "markdown-it":"*",
+    "openport":"*"
   }
 }

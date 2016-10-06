@@ -1,0 +1,23 @@
+// ------------------------------------------------------------------
+// Section List
+// ------------------------------------------------------------------
+// 1. Scale ............ Scaling and size fitting with margin
+// 2. Outline .......... Shadow, hovered and current states
+// 3. Content .......... Disabled slide content in List mode
+// ------------------------------------------------------------------
+
+.slide {
+	// Scale
+	transform-origin:0 0;
+	transform: scale(calc(var(--slidePreviewWidth) / var(--slideWidth)));
+  margin-bottom: calc(calc(-1px * calc(var(--slideHeight) - calc(var(--slideHeight) * calc(var(--slidePreviewWidth) / var(--slideWidth))))));
+	border-radius:2px;
+	border:1px solid gray;
+	// Content
+	* {
+		pointer-events:none;
+		}
+
+	//@import 'content/footer-list';
+
+	}

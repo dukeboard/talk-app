@@ -1,0 +1,27 @@
+// ------------------------------------------------------------------
+// Shower List
+// ------------------------------------------------------------------
+
+.shower.list {
+
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+  align-items: stretch;
+
+	width:100%;
+	background:#585A5E;
+	//flex-grow: 1;
+
+	// IE10-11 scrolling fix
+
+	position:absolute;
+	clip:rect(0, auto, auto, 0);
+
+	// Elements
+
+	@import
+		'../caption/caption-list',
+		'../slide/slide-list',
+		'../badge/badge-list';
+	}

@@ -12,22 +12,24 @@
 	position:relative;
 	z-index:1;
 	overflow:hidden;
-	padding:50px 50px 0;
+	padding:80px 80px 0;
 	width:$width;
 	height:$height;
 	background:#FFF;
-	font-size:22px;
+	font-size:25px;
 	// Number
 
 	&::after {
+		font-weight: bold;
 		position:absolute;
-		top:0;
-		right:100px;
-		padding-top:15px;
+		bottom:0;
+		right:80px;
+		padding-bottom:10px;
 		width:50px;
-		height:100px;
-		background:url(../images/ribbon.svg) no-repeat;
-		color:#FFF;
+		height:80px;
+		font-size:20px;
+		//background:url(../images/ribbon.svg) no-repeat;
+		color: $grey;
 		counter-increment:slide;
 		content:counter(slide);
 		text-align:center;

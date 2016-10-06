@@ -167,12 +167,14 @@ let menuTemplate = [{
 						var foundPath = paths[foundIndex];
 						if(foundPath == undefined){
 							saveFileDialog(function(path){
-								var array = path.split("/");
-								filename = array[array.length - 1];
-								focusedWindow.setTitle(filename + " | TalkApp");
-								paths[foundIndex] = path;
-								var saveQuery = {path:path,content:"",index:foundIndex};
-								focusedWindow.webContents.send('req-save',saveQuery);
+								if(path){
+									var array = path.split("/");
+									filename = array[array.length - 1];
+									focusedWindow.setTitle(filename + " | TalkApp");
+									paths[foundIndex] = path;
+									var saveQuery = {path:path,content:"",index:foundIndex};
+									focusedWindow.webContents.send('req-save',saveQuery);
+								}
 							});
 						} else {
 							var saveQuery = {path:paths[foundIndex],content:"",index:foundIndex};

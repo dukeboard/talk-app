@@ -11,6 +11,8 @@
     "monaco-editor": "*",
     "golden-layout": "*",
     "markdown-it":"*",
-    "openport":"*"
+    "markdown-it-decorate":"*",
+    "openport":"*",
+    "highlight.js":"*"
   }
 }

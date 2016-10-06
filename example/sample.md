@@ -1,3 +1,6 @@
+# Hello <!-- {.shout} -->
+
+--- 
 
 ![](images/cover.png)
 
@@ -27,7 +30,8 @@
 
 <img src="images/result.png" style="width:40%;" />
 
----
+--- 
+<!--{}-->
 ## Distraction free keynote!
 
 ---
@@ -42,6 +46,8 @@ class ExampleOfClass {
   }
 }
 ```
+
+**lkcqdjlkfjs**
 
 ---
 

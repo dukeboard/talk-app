@@ -2,9 +2,15 @@
 // Quote
 // ------------------------------------------------------------------
 
+
 blockquote {
 
 	font-style:italic;
+	$border: hsl(0, 0%, 90%) !default;
+	border-left: 4px solid $border;
+	padding: 0.6em 1.2em;
+	font-size:22px;
+	color:$grey;
 
 	&::before {
 		position:absolute;
@@ -12,15 +18,16 @@ blockquote {
 		color:#CCC;
 		line-height:1;
 		font-size:8em;
-		content:'\201C';
-		}
+	}
 
 	// Author
 
 	& + figcaption {
+		color:#CCC;
+		padding: 0em 1.2em;
 		margin:-1em 0 1em;
 		font-style:italic;
 		font-weight:bold;
-		}
+	}
 
 	}

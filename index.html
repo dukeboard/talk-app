@@ -9,20 +9,45 @@
         height:100%;
       }
     </style>
+		<link rel="stylesheet" href="shower/themes/talk/fonts/overpass/recommended.css">
 		<script src="jquery.js"></script>
     <script src="goldenlayout.js"></script>
+		<script src="highlight/highlight.pack.js"></script>
 		<script src="node_modules/markdown-it/dist/markdown-it.js"></script>
+		<script src="node_modules/markdown-it-decorate/index.js"></script>
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-base.css" />
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-light-theme.css" />
 		<link type="text/css" rel="stylesheet" href="shower/themes/talk/styles/screen-4x3.css" />
+		<link type="text/css" rel="stylesheet" href="highlight/styles/agate.css" />
+		<style>
+			.hljs {
+				border-radius: 5px;
+				font-size: 20px;
+			}
+		</style>
 </head>
 <body>
 	<script>
-		var md = new window.markdownit({html:true,xhtmlOut:true});
+		var md = new window.markdownit({
+			html:true,
+			xhtmlOut:true,
+			highlight: function (str, lang) {
+				try {
+				        return '<pre class="hljs"><code>' +
+				               hljs.highlight(lang, str, true).value +
+				               '</code></pre>';
+				} catch (__) {}
+
+    		return ''; // use external default escaping
+  		}
+		});
 		function hr_section(tokens, idx, options, env, self) {
 		  return '</section><section class=\"slide\">';
 		};
 		md.renderer.rules['hr'] = hr_section
+		md.use(function attributes (md) {
+  		md.core.ruler.push('curly_attributes', curlyAttrs)
+		});
 		var remote = require('electron');
 		var path = require('path');
 	</script>

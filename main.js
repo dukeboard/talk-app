@@ -5,7 +5,7 @@ const BrowserWindow = electron.BrowserWindow;
 const dialog = electron.dialog;
 const fs = require('fs');
 const ipc = require('electron').ipcMain;
-const openport = require('openport');
+const portFinder = require('find-port');
 const http = require('http');
 const url = require('url');
 const path = require('path');
@@ -41,9 +41,18 @@ const mimeType = {
 };
 
 function createWindow () {
-	openport.find(function(err, port) {
-  	if(err) { console.log(err); return; }
-		var newWindow = new BrowserWindow({width: 800, height: 600,show: false,icon: 'icon.icns'});
+	portFinder('127.0.0.1', 8500, 8600,function(ports) {
+		var port = ports[0];
+		var newWindow = new BrowserWindow({
+			width: 800,
+			height: 600,
+			show: false,
+			icon: 'icon.icns',
+			webPreferences: {
+    		nodeIntegration: false,
+    		preload: `${__dirname}/preload.js`
+			}
+		});
 		windows.push(newWindow);
 		let index = windowIndex(newWindow);
 		function handleRequest(request, response){
@@ -79,7 +88,7 @@ function createWindow () {
 			//newWindow.loadURL(`file://${__dirname}/index.html`)
 			newWindow.loadURL(`http://127.0.0.1:${port}/index.html`)
 		});
-		newWindow.webContents.openDevTools()
+		//newWindow.webContents.openDevTools()
 		newWindow.on('closed', function () {
 			var winIndex = windowIndex(newWindow);
 			delete windows[winIndex];

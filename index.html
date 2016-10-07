@@ -13,8 +13,8 @@
 		<script src="jquery.js"></script>
     <script src="goldenlayout.js"></script>
 		<script src="highlight/highlight.pack.js"></script>
-		<script src="node_modules/markdown-it/dist/markdown-it.js"></script>
-		<script src="node_modules/markdown-it-decorate/index.js"></script>
+		<script src="markdown/markdown-it.min.js"></script>
+		<script src="markdown/decorate.js"></script>
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-base.css" />
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-light-theme.css" />
 		<link type="text/css" rel="stylesheet" href="shower/themes/talk/styles/screen-4x3.css" />
@@ -37,7 +37,6 @@
 				               hljs.highlight(lang, str, true).value +
 				               '</code></pre>';
 				} catch (__) {}
-
     		return ''; // use external default escaping
   		}
 		});
@@ -48,14 +47,13 @@
 		md.use(function attributes (md) {
   		md.core.ruler.push('curly_attributes', curlyAttrs)
 		});
-		var remote = require('electron');
-		var path = require('path');
+		var remote = window.remote;
 	</script>
-	<script src="node_modules/monaco-editor/min/vs/loader.js"></script>
-	<script>
-		self.module = undefined;
-		self.process.browser = true;
-	</script>
+	<script>var require = { paths: { 'vs': 'monaco/vs' } };</script>
+	<script src="monaco/vs/loader.js"></script>
+	<script src="monaco/vs/editor/editor.main.nls.js"></script>
+	<script src="monaco/vs/editor/editor.main.js"></script>
+
   <script>
   var config = {
       content: [{
@@ -101,11 +99,27 @@
 	});
 
   myLayout.registerComponent( 'editorPanel', function(container){
-		require.config({ paths: { 'vs': 'node_modules/monaco-editor/min/vs' }});
-		require(['vs/editor/editor.main'], function() {
+/*
+		function uriFromPath(_path) {
+			var pathName = path.resolve(_path).replace(/\\/g, '/');
+			if (pathName.length > 0 && pathName.charAt(0) !== '/') {
+				pathName = '/' + pathName;
+			}
+			console.log(_path);
+			//console.log(_path,'file://' + pathName);
+			return encodeURI('file://' + pathName);
+		}
+		require.config({
+			baseUrl: uriFromPath(path.join(__dirname, 'node_modules/monaco-editor/min'))
+		});*/
+		//self.module = undefined;
+		//self.process.browser = true;
+	//	require.config({ paths: { 'vs': 'monaco/vs' }});
+	//	require(['vs/editor/editor.main'], function() {
 			var editorDiv = document.createElement('div');
 			editorDiv.id = 'editor';
 			container.getElement().append(editorDiv);
+
 			var editor = monaco.editor.create(editorDiv, {
 				value: [
 					'# Hello',
@@ -126,6 +140,9 @@
 			editor.onDidChangeModelContent(function(){
 				remote.ipcRenderer.send('edited');
 				var contentResult = md.render(editor.getValue());
+
+console.log(contentResult);
+
 				var extResult = '<section class=\"slide\">'+contentResult+'</section>';
 				slideContainer.innerHTML = extResult;
 			});
@@ -133,7 +150,8 @@
 			var extResult = '<section class=\"slide\">'+contentResult+'</section>';
 			slideContainer.innerHTML = extResult;
 
-		});
+
+	//	});
 	});
   myLayout.init();
   </script>

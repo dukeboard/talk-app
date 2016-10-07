@@ -2,17 +2,10 @@
   "name": "Talk-app",
   "version": "0.1.0",
   "main": "main.js",
-  "devDependencies": {
-    "electron-packager": "*"
-  },
   "dependencies": {
     "jquery": "*",
-    "remark":"*",
-    "monaco-editor": "*",
     "golden-layout": "*",
-    "markdown-it":"*",
-    "markdown-it-decorate":"*",
-    "openport":"*",
+    "find-port":"*",
     "highlight.js":"*"
   }
 }

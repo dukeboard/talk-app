@@ -41,12 +41,46 @@
   		}
 		});
 		function hr_section(tokens, idx, options, env, self) {
-		  return '</section><section class=\"slide\">';
+			var token = tokens[idx];
+			var result = '</section>';
+			var classes = 'slide';
+			if(token.attrs){
+				for(var i=0;i<token.attrs.length;i++){
+					var tokenAttr = token.attrs[i];
+					if(tokenAttr.length == 2 && tokenAttr[0] == 'class'){
+						classes = classes + ' ' + tokenAttr[1];
+					}
+				}
+			}
+			result = result + '<section class="' + classes + '">';
+		  return result;
 		};
 		md.renderer.rules['hr'] = hr_section
 		md.use(function attributes (md) {
   		md.core.ruler.push('curly_attributes', curlyAttrs)
 		});
+		/*
+		md.core.ruler.push('slideInit',function(tokens){
+			console.log(tokens)
+		});
+		*/
+		function mdProcess(mdContent){
+			var contentResult = md.render(mdContent);
+			var trimmed = mdContent.trim();
+			if(trimmed.indexOf('<!--{.darkSlide}-->') === 0){
+				return '<section class=\"slide darkSlide\">'+contentResult+'</section>';
+			}
+			if(trimmed.indexOf('<!--{.greenSlide}-->') === 0){
+				return '<section class=\"slide greenSlide\">'+contentResult+'</section>';
+			}
+			if(trimmed.indexOf('<!--{.redSlide}-->') === 0){
+				return '<section class=\"slide redSlide\">'+contentResult+'</section>';
+			}
+			if(trimmed.indexOf('<!--{.yellowSlide}-->') === 0){
+				return '<section class=\"slide yellowSlide\">'+contentResult+'</section>';
+			}
+			return '<section class=\"slide\">'+contentResult+'</section>';
+		}
 		var remote = window.remote;
 	</script>
 	<script>var require = { paths: { 'vs': 'monaco/vs' } };</script>
@@ -99,59 +133,41 @@
 	});
 
   myLayout.registerComponent( 'editorPanel', function(container){
-/*
-		function uriFromPath(_path) {
-			var pathName = path.resolve(_path).replace(/\\/g, '/');
-			if (pathName.length > 0 && pathName.charAt(0) !== '/') {
-				pathName = '/' + pathName;
-			}
-			console.log(_path);
-			//console.log(_path,'file://' + pathName);
-			return encodeURI('file://' + pathName);
-		}
-		require.config({
-			baseUrl: uriFromPath(path.join(__dirname, 'node_modules/monaco-editor/min'))
-		});*/
 		//self.module = undefined;
 		//self.process.browser = true;
-	//	require.config({ paths: { 'vs': 'monaco/vs' }});
-	//	require(['vs/editor/editor.main'], function() {
-			var editorDiv = document.createElement('div');
-			editorDiv.id = 'editor';
-			container.getElement().append(editorDiv);
-
-			var editor = monaco.editor.create(editorDiv, {
-				value: [
-					'# Hello',
-					'world'
-				].join('\n'),
-				language: 'markdown'
-			});
-			container.on('resize',function(){
-				editor.layout();
-			});
-			remote.ipcRenderer.on('file-contents',function(event,arg){
-				editor.setValue(arg);
-			});
-			remote.ipcRenderer.on('req-save',function(event,arg){
-				arg.content = editor.getValue();
-				remote.ipcRenderer.send('resp-save',arg);
-			});
-			editor.onDidChangeModelContent(function(){
-				remote.ipcRenderer.send('edited');
-				var contentResult = md.render(editor.getValue());
-
-console.log(contentResult);
-
-				var extResult = '<section class=\"slide\">'+contentResult+'</section>';
-				slideContainer.innerHTML = extResult;
-			});
-			var contentResult = md.render(editor.getValue());
-			var extResult = '<section class=\"slide\">'+contentResult+'</section>';
-			slideContainer.innerHTML = extResult;
-
-
-	//	});
+		var editorDiv = document.createElement('div');
+		editorDiv.id = 'editor';
+		container.getElement().append(editorDiv);
+		var editor = monaco.editor.create(editorDiv, {
+			value: [
+				'# Hello',
+				'world'
+			].join('\n'),
+			language: 'markdown'
+		});
+		container.on('resize',function(){
+			editor.layout();
+		});
+		remote.ipcRenderer.on('file-contents',function(event,arg){
+			editor.setValue(arg);
+		});
+		remote.ipcRenderer.on('req-save',function(event,arg){
+			arg.content = editor.getValue();
+			remote.ipcRenderer.send('resp-save',arg);
+		});
+		remote.ipcRenderer.on('req-content',function(event,arg){
+			arg.content = mdProcess(editor.getValue());
+			remote.ipcRenderer.send('resp-content',arg);
+		});
+		remote.ipcRenderer.on('req-print-content',function(event,arg){
+			arg.content = mdProcess(editor.getValue());
+			remote.ipcRenderer.send('resp-print-content',arg);
+		});
+		editor.onDidChangeModelContent(function(){
+			remote.ipcRenderer.send('edited');
+			slideContainer.innerHTML = mdProcess(editor.getValue());
+		});
+		slideContainer.innerHTML = mdProcess(editor.getValue());
 	});
   myLayout.init();
   </script>

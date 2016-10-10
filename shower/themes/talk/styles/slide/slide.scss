@@ -61,4 +61,82 @@
 		'elements/cover',
 		'elements/place';
 
+		b, strong {
+			color: #f4b400;
+		}
+		i, em {
+			color: #777872;
+		}
+
 	}
+
+.darkSlide {
+		background:#272822;
+		color: #FFFFFF;
+		h1,h2,h3 {
+			color: #FFFFFF;
+		}
+		h4 {
+			color: #777872;
+		}
+}
+
+.greenSlide {
+		background:#0fa758;
+		color: #FFFFFF;
+		b, strong {
+			color: #fcde32;
+		}
+		h1,h2,h3 {
+			color: #FFFFFF;
+		}
+		h4 {
+			color: #777872;
+		}
+		ol, ul {
+			li {
+				&::before {
+					color: #777872;
+				}
+			}
+		}
+}
+
+.redSlide {
+		background:#db4441;
+		color: #FFFFFF;
+		h1,h2,h3 {
+			color: #FFFFFF;
+		}
+		b, strong {
+			color: #fcde32;
+		}
+		ol, ul {
+			li {
+				&::before {
+					color: #46c3d3;
+				}
+			}
+		}
+		i, em {
+			color: #46c3d3;
+		}
+}
+
+.yellowSlide {
+		background:#f4b400;
+		color: #FFFFFF;
+		b, strong {
+			color: #f8305f;
+		}
+		h1, h2, h3 {
+			color: #FFFFFF;
+		}
+		ol, ul {
+			li {
+				&::before {
+					color: #777872;
+				}
+			}
+		}
+}

@@ -14,10 +14,21 @@ var windows = [];
 var paths = [];
 var roots = [];
 var servers = [];
+var ports = [];
+var contents = [];
+var previews = [];
 
 function windowIndex(window){
 	for(var i=0;i<windows.length;i++){
 		if(windows[i] === window){
+			return i;
+		}
+	}
+}
+
+function portIndex(port){
+	for(var i=0;i<ports.length;i++){
+		if(ports[i] === port){
 			return i;
 		}
 	}
@@ -41,8 +52,8 @@ const mimeType = {
 };
 
 function createWindow () {
-	portFinder('127.0.0.1', 8500, 8600,function(ports) {
-		var port = ports[0];
+	portFinder('127.0.0.1', 8500, 8600,function(foundPorts) {
+		let port = foundPorts[0];//take first
 		var newWindow = new BrowserWindow({
 			width: 800,
 			height: 600,
@@ -77,16 +88,23 @@ function createWindow () {
 						response.end(`Error getting the file: ${err}.`);
 					}
 				} else {
-					response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
-					response.end(data);
+					if(request.url == '/full.html'||request.url == '/print.html'){
+						var dataString = data.toString();
+						dataString = dataString.replace('{content}',contents[portIndex(port)]);
+						response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
+						response.end(dataString);
+					} else {
+						response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
+						response.end(data);
+					}
 				}
 			});
 		}
 		var server = http.createServer(handleRequest);
+		ports[index] = port;
 		servers[index] = server;
 		server.listen(port,'127.0.0.1', function(){
-			//newWindow.loadURL(`file://${__dirname}/index.html`)
-			newWindow.loadURL(`http://127.0.0.1:${port}/index.html`)
+			newWindow.loadURL(`http://127.0.0.1:${port}/index.html`);
 		});
 		//newWindow.webContents.openDevTools()
 		newWindow.on('closed', function () {
@@ -96,6 +114,15 @@ function createWindow () {
 			delete roots[winIndex];
 			servers[winIndex].close();
 			delete servers[winIndex];
+			delete ports[winIndex];
+			delete contents[winIndex];
+			if(previews[winIndex]){
+				try {
+					previews[winIndex].close();
+				} catch(e){
+				}
+			}
+			delete previews[winIndex];
 		});
 		newWindow.once('ready-to-show', () => {
 		        newWindow.maximize();
@@ -110,6 +137,39 @@ ipc.on('resp-save', function(event, eventData) {
 
 ipc.on('edited',function(){
 	BrowserWindow.getFocusedWindow().setDocumentEdited(true);
+});
+
+ipc.on('resp-content',function(event,eventData){
+	var index = portIndex(eventData.port);
+	contents[index] = eventData.content;
+	var previewWindow = previews[index];
+	if(previewWindow){
+		previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/full.html`);
+		previewWindow.once('ready-to-show', () => {
+						previewWindow.setFullScreen(true);
+						previewWindow.maximize();
+						previewWindow.show();
+		});
+	}
+});
+
+ipc.on('resp-print-content',function(event,eventData){
+	var index = portIndex(eventData.port);
+	contents[index] = eventData.content;
+	var previewWindow = previews[index];
+	if(previewWindow){
+		previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/print.html`);
+		previewWindow.once('ready-to-show', () => {
+				previewWindow.webContents.printToPDF({
+		      landscape: true
+		    }, function(err, data) {
+		      fs.writeFile(eventData.path, data, function(err) {
+		        if(err) alert('genearte pdf error', err);
+						delete previews[index];
+		      });
+		    });
+		});
+	}
 });
 
 app.on('activate', () => {
@@ -202,6 +262,31 @@ let menuTemplate = [{
 						});
         }
     }, {
+        label: 'Print As PDF',
+        accelerator: 'CmdOrCtrl+P',
+        click: function(item, focusedWindow) {
+            savePDFFileDialog(function(path){
+							if (focusedWindow) {
+								var currentIndex = windowIndex(focusedWindow);
+									var port = ports[currentIndex];
+									if(port){
+										var newWindow = new BrowserWindow({
+											width: 800,
+											height: 600,
+											show: false,
+											icon: 'icon.icns',
+											webPreferences: {
+												nodeIntegration: false,
+												offscreen: true
+											}
+										});
+										previews[currentIndex] = newWindow;
+										focusedWindow.webContents.send('req-print-content',{port:port, path: path});
+									}
+	            }
+						});
+        }
+    }, {
         label: 'Quit',
         accelerator: 'CmdOrCtrl+Q',
         click: function(item, focusedWindow) {
@@ -240,6 +325,37 @@ let menuTemplate = [{
 }, {
     label: 'View',
     submenu: [{
+        label: 'Toggle Presentation Mode',
+        accelerator: (function() {
+            if (process.platform === 'darwin') {
+                return 'Ctrl+Command+P';
+            } else {
+                return 'F10';
+            }
+        })(),
+        click: function(item, focusedWindow) {
+            if (focusedWindow) {
+							var currentIndex = windowIndex(focusedWindow);
+								var port = ports[currentIndex];
+								if(port){
+									var newWindow = new BrowserWindow({
+										width: 800,
+										height: 600,
+										show: false,
+										icon: 'icon.icns',
+										webPreferences: {
+											nodeIntegration: false
+										}
+									});
+									previews[currentIndex] = newWindow;
+									newWindow.on('closed', function () {
+										focusedWindow.focus();
+									});
+									focusedWindow.webContents.send('req-content',{port:port});
+								}
+            }
+        }
+    }, {
         label: 'Toggle Full Screen',
         accelerator: (function() {
             if (process.platform === 'darwin') {
@@ -319,6 +435,15 @@ function saveFileDialog(callback) {
         filters: [{
             name: 'Markdown',
             extensions: ['md']
+        }]
+    }, callback);
+}
+
+function savePDFFileDialog(callback) {
+    dialog.showSaveDialog({
+        filters: [{
+            name: 'PDF',
+            extensions: ['pdf']
         }]
     }, callback);
 }

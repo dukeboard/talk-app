@@ -10,29 +10,8 @@ const http = require('http');
 const url = require('url');
 const path = require('path');
 
-var windows = [];
-var paths = [];
-var roots = [];
-var servers = [];
-var ports = [];
-var contents = [];
-var previews = [];
-
-function windowIndex(window){
-	for(var i=0;i<windows.length;i++){
-		if(windows[i] === window){
-			return i;
-		}
-	}
-}
-
-function portIndex(port){
-	for(var i=0;i<ports.length;i++){
-		if(ports[i] === port){
-			return i;
-		}
-	}
-}
+var models = {};
+var ports = {};
 
 const mimeType = {
 	'.ico': 'image/x-icon',
@@ -54,6 +33,7 @@ const mimeType = {
 function createWindow () {
 	portFinder('127.0.0.1', 8500, 8600,function(foundPorts) {
 		let port = foundPorts[0];//take first
+
 		var newWindow = new BrowserWindow({
 			width: 800,
 			height: 600,
@@ -64,15 +44,16 @@ function createWindow () {
     		preload: `${__dirname}/preload.js`
 			}
 		});
-		windows.push(newWindow);
-		let index = windowIndex(newWindow);
+		ports[newWindow.id] = port;
+		models[port] = {};
+		models[port].window = newWindow;
 		function handleRequest(request, response){
 			const parsedUrl = url.parse(request.url);
 			let pathname = `.${parsedUrl.pathname}`;
 			const ext = path.parse(pathname).ext;
 			fs.readFile(`${__dirname}${request.url}`, function(err, data){
 				if(err){
-					var currentRoot = roots[index];
+					var currentRoot = models[port].root;
 					if(currentRoot){
 						fs.readFile(`${currentRoot}${request.url}`, function(err2, data2){
 							if(err2){
@@ -90,7 +71,7 @@ function createWindow () {
 				} else {
 					if(request.url == '/full.html'||request.url == '/print.html'){
 						var dataString = data.toString();
-						dataString = dataString.replace('{content}',contents[portIndex(port)]);
+						dataString = dataString.replace('{content}',models[port].content);
 						response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
 						response.end(dataString);
 					} else {
@@ -100,29 +81,19 @@ function createWindow () {
 				}
 			});
 		}
-		var server = http.createServer(handleRequest);
-		ports[index] = port;
-		servers[index] = server;
-		server.listen(port,'127.0.0.1', function(){
+		models[port].server = http.createServer(handleRequest);;
+		models[port].server.listen(port,'127.0.0.1', function(){
 			newWindow.loadURL(`http://127.0.0.1:${port}/index.html`);
 		});
-		//newWindow.webContents.openDevTools()
 		newWindow.on('closed', function () {
-			var winIndex = windowIndex(newWindow);
-			delete windows[winIndex];
-			delete paths[winIndex];
-			delete roots[winIndex];
-			servers[winIndex].close();
-			delete servers[winIndex];
-			delete ports[winIndex];
-			delete contents[winIndex];
-			if(previews[winIndex]){
+			var model = models[port];
+			if(model.server){
 				try {
-					previews[winIndex].close();
+					model.server.close();
 				} catch(e){
 				}
 			}
-			delete previews[winIndex];
+			delete models[port];
 		});
 		newWindow.once('ready-to-show', () => {
 		        newWindow.maximize();
@@ -132,7 +103,13 @@ function createWindow () {
 }
 
 ipc.on('resp-save', function(event, eventData) {
-    writeFile(eventData.path, eventData.content,windows[eventData.index]);
+	  if(models[eventData.port]){
+			var savedPath = models[eventData.port].path;
+			if(savedPath){
+				var window = models[eventData.port].window;
+				writeFile(savedPath, eventData.content,window);
+			}
+		}
 });
 
 ipc.on('edited',function(){
@@ -140,35 +117,37 @@ ipc.on('edited',function(){
 });
 
 ipc.on('resp-content',function(event,eventData){
-	var index = portIndex(eventData.port);
-	contents[index] = eventData.content;
-	var previewWindow = previews[index];
-	if(previewWindow){
-		previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/full.html`);
-		previewWindow.once('ready-to-show', () => {
-						previewWindow.setFullScreen(true);
-						previewWindow.maximize();
-						previewWindow.show();
-		});
+	if(models[eventData.port]){
+		models[eventData.port].content = eventData.content;
+		var previewWindow = models[eventData.port].preview;
+		if(previewWindow){
+			previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/full.html`);
+			previewWindow.once('ready-to-show', () => {
+							previewWindow.setFullScreen(true);
+							previewWindow.maximize();
+							previewWindow.show();
+			});
+		}
 	}
 });
 
 ipc.on('resp-print-content',function(event,eventData){
-	var index = portIndex(eventData.port);
-	contents[index] = eventData.content;
-	var previewWindow = previews[index];
-	if(previewWindow){
-		previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/print.html`);
-		previewWindow.once('ready-to-show', () => {
-				previewWindow.webContents.printToPDF({
-		      landscape: true
-		    }, function(err, data) {
-		      fs.writeFile(eventData.path, data, function(err) {
-		        if(err) alert('genearte pdf error', err);
-						delete previews[index];
-		      });
-		    });
-		});
+	if(models[eventData.port]){
+		models[eventData.port].content = eventData.content;
+		var previewWindow = models[eventData.port].preview;
+		if(previewWindow){
+			previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/print.html`);
+			previewWindow.once('ready-to-show', () => {
+					previewWindow.webContents.printToPDF({
+			      landscape: true
+			    }, function(err, data) {
+			      fs.writeFile(eventData.path, data, function(err) {
+			        if(err) alert('genearte pdf error', err);
+							models[eventData.port].preview = undefined;
+			      });
+			    });
+			});
+		}
 	}
 });
 
@@ -214,17 +193,17 @@ let menuTemplate = [{
             // or put it in a new window
             selectFileDialog((files) => {
                 if (files != undefined) {
-                    globalFilePath = files;
-										var foundIndex = windowIndex(focusedWindow);
-										paths[foundIndex] = globalFilePath;
-                    // extract the filename
-                    var array = globalFilePath.split("/");
-                    filename = array[array.length - 1];
-										roots[foundIndex] = globalFilePath.slice(0,globalFilePath.length - (filename.length+1));
+									var port = ports[focusedWindow.id];
+									if(models[port]){
+										models[port].path = files;
+										var array = files.split("/");
+										filename = array[array.length - 1];
 										focusedWindow.setTitle(filename + " | TalkApp");
-                    readFile(files, (content) => {
-                        focusedWindow.webContents.send('file-contents', content);
-                    },focusedWindow);
+										models[port].root = files.slice(0,files.length - (filename.length+1));
+										readFile(files, (content) => {
+												focusedWindow.webContents.send('file-contents', content);
+										},focusedWindow);
+									}
                 }
             });
         }
@@ -232,34 +211,35 @@ let menuTemplate = [{
         label: 'Save',
         accelerator: 'CmdOrCtrl+S',
         click: function(item, focusedWindow) {
-					  var foundIndex = windowIndex(focusedWindow);
-						var foundPath = paths[foundIndex];
-						if(foundPath == undefined){
-							saveFileDialog(function(path){
-								if(path){
-									var array = path.split("/");
-									filename = array[array.length - 1];
-									focusedWindow.setTitle(filename + " | TalkApp");
-									paths[foundIndex] = path;
-									var saveQuery = {path:path,content:"",index:foundIndex};
-									focusedWindow.webContents.send('req-save',saveQuery);
-								}
-							});
-						} else {
-							var saveQuery = {path:paths[foundIndex],content:"",index:foundIndex};
-							focusedWindow.webContents.send('req-save',saveQuery);
+					  var port = ports[focusedWindow.id];
+						if(models[port]){
+							var foundPath = models[port].path;
+							if(foundPath == undefined){
+								saveFileDialog(function(path){
+									if(path){
+										var array = path.split("/");
+										filename = array[array.length - 1];
+										focusedWindow.setTitle(filename + " | TalkApp");
+										models[port].path = path;
+										focusedWindow.webContents.send('req-save',{port:port,content:""});
+									}
+								});
+							} else {
+								focusedWindow.webContents.send('req-save',{port:port,content:""});
+							}
 						}
         }
     }, {
         label: 'Save As',
         accelerator: 'CmdOrCtrl+Shift+S',
         click: function(item, focusedWindow) {
-            saveFileDialog(function(path){
-							var foundIndex = windowIndex(focusedWindow);
-							paths[foundIndex] = path;
-							var saveQuery = {path:path,content:"",index:foundIndex};
-							focusedWindow.webContents.send('req-save',saveQuery);
-						});
+          saveFileDialog(function(path){
+						var port = ports[focusedWindow.id];
+						if(models[port]){
+							models[port].path = path;
+							focusedWindow.webContents.send('req-save',{port:port,content:""});
+						}
+					});
         }
     }, {
         label: 'Print As PDF',
@@ -267,10 +247,9 @@ let menuTemplate = [{
         click: function(item, focusedWindow) {
             savePDFFileDialog(function(path){
 							if (focusedWindow) {
-								var currentIndex = windowIndex(focusedWindow);
-									var port = ports[currentIndex];
+									var port = ports[focusedWindow.id];
 									if(port){
-										var newWindow = new BrowserWindow({
+										models[port].preview = new BrowserWindow({
 											width: 800,
 											height: 600,
 											show: false,
@@ -280,7 +259,6 @@ let menuTemplate = [{
 												offscreen: true
 											}
 										});
-										previews[currentIndex] = newWindow;
 										focusedWindow.webContents.send('req-print-content',{port:port, path: path});
 									}
 	            }
@@ -335,8 +313,7 @@ let menuTemplate = [{
         })(),
         click: function(item, focusedWindow) {
             if (focusedWindow) {
-							var currentIndex = windowIndex(focusedWindow);
-								var port = ports[currentIndex];
+								var port = ports[focusedWindow.id];
 								if(port){
 									var newWindow = new BrowserWindow({
 										width: 800,
@@ -347,7 +324,7 @@ let menuTemplate = [{
 											nodeIntegration: false
 										}
 									});
-									previews[currentIndex] = newWindow;
+									models[port].preview = newWindow;
 									newWindow.on('closed', function () {
 										focusedWindow.focus();
 									});
@@ -472,9 +449,4 @@ function writeFile(filePath, contents, currentWindow) {
 
 function error(type, message, currentWindow) {
 		console.log("ERROR",type,message);
-    var data = {
-        type: type,
-        message: message
-    };
-    //currentWindow.webContents.send('error', data);
 }

@@ -1,6 +1,8 @@
 # Hello <!-- {.shout} -->
 
---- 
+TODO
+
+---
 
 ![](images/cover.png)
 
@@ -30,7 +32,7 @@
 
 <img src="images/result.png" style="width:40%;" />
 
---- 
+---
 <!--{}-->
 ## Distraction free keynote!
 
@@ -48,6 +50,14 @@ class ExampleOfClass {
 ```
 
 **lkcqdjlkfjs**
+
+
+
+darkSlide
+greenSlide
+redSlide
+yellowSlide
+greySlide
 
 ---
 

@@ -6,11 +6,12 @@ ol, ul {
 
 	margin-bottom:1em;
 	counter-reset:list;
+	margin-left: 1em;
 
 	li {
 
 		page-break-inside:avoid;
-		text-indent:-0.7em;
+		text-indent:-2em;
 
 		// Marker
 

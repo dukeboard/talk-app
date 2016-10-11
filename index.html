@@ -148,8 +148,11 @@
 		container.on('resize',function(){
 			editor.layout();
 		});
+		var currentInject = false;
 		remote.ipcRenderer.on('file-contents',function(event,arg){
+			currentInject = true;
 			editor.setValue(arg);
+			currentInject = false;
 		});
 		remote.ipcRenderer.on('req-save',function(event,arg){
 			arg.content = editor.getValue();
@@ -164,7 +167,9 @@
 			remote.ipcRenderer.send('resp-print-content',arg);
 		});
 		editor.onDidChangeModelContent(function(){
-			remote.ipcRenderer.send('edited');
+			if(!currentInject){
+				remote.ipcRenderer.send('edited');
+			}
 			slideContainer.innerHTML = mdProcess(editor.getValue());
 		});
 		slideContainer.innerHTML = mdProcess(editor.getValue());

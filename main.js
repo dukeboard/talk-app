@@ -33,10 +33,9 @@ const mimeType = {
 function createWindow () {
 	portFinder('127.0.0.1', 8500, 8600,function(foundPorts) {
 		let port = foundPorts[0];//take first
-
 		var newWindow = new BrowserWindow({
-			width: 800,
-			height: 600,
+			width: 1024,
+			height: 768,
 			show: false,
 			icon: 'icon.icns',
 			webPreferences: {
@@ -44,6 +43,10 @@ function createWindow () {
     		preload: `${__dirname}/preload.js`
 			}
 		});
+		var filename = "unamed";
+		newWindow.setTitle(filename + " | TalkApp");
+		newWindow.setRepresentedFilename(filename);
+		newWindow.setDocumentEdited(true);
 		ports[newWindow.id] = port;
 		models[port] = {};
 		models[port].window = newWindow;
@@ -95,6 +98,18 @@ function createWindow () {
 			}
 			delete models[port];
 		});
+
+		newWindow.on('close', function(e){
+			if(newWindow.isDocumentEdited()){
+				var choice = dialog.showMessageBox(newWindow,{
+												type: 'question',
+												buttons: ['Yes', 'No'],
+												title: 'Confirm',
+												message: 'Your talk is unsaved, do you really want to quit ?'});
+				if(choice !== 0){ e.preventDefault(); }
+			}
+		});
+
 		newWindow.once('ready-to-show', () => {
 		        newWindow.maximize();
 		        newWindow.show();
@@ -106,8 +121,7 @@ ipc.on('resp-save', function(event, eventData) {
 	  if(models[eventData.port]){
 			var savedPath = models[eventData.port].path;
 			if(savedPath){
-				var window = models[eventData.port].window;
-				writeFile(savedPath, eventData.content,window);
+				writeFile(savedPath, eventData.content,models[eventData.port].window);
 			}
 		}
 });
@@ -154,7 +168,7 @@ ipc.on('resp-print-content',function(event,eventData){
 app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-		if(windows.length == 0){
+		if(models.length == 0){
 			createWindow();
 		}
 });
@@ -172,7 +186,7 @@ app.on('window-all-closed', function () {
 })
 
 app.on('activate', function () {
-	if(windows.length == 0){
+	if(models.length == 0){
 		createWindow()
 	}
 })
@@ -199,6 +213,8 @@ let menuTemplate = [{
 										var array = files.split("/");
 										filename = array[array.length - 1];
 										focusedWindow.setTitle(filename + " | TalkApp");
+										focusedWindow.setRepresentedFilename(filename);
+										focusedWindow.setDocumentEdited(false);
 										models[port].root = files.slice(0,files.length - (filename.length+1));
 										readFile(files, (content) => {
 												focusedWindow.webContents.send('file-contents', content);
@@ -218,8 +234,9 @@ let menuTemplate = [{
 								saveFileDialog(function(path){
 									if(path){
 										var array = path.split("/");
-										filename = array[array.length - 1];
+										var filename = array[array.length - 1];
 										focusedWindow.setTitle(filename + " | TalkApp");
+										focusedWindow.setRepresentedFilename(filename);
 										models[port].path = path;
 										focusedWindow.webContents.send('req-save',{port:port,content:""});
 									}
@@ -234,10 +251,16 @@ let menuTemplate = [{
         accelerator: 'CmdOrCtrl+Shift+S',
         click: function(item, focusedWindow) {
           saveFileDialog(function(path){
-						var port = ports[focusedWindow.id];
-						if(models[port]){
-							models[port].path = path;
-							focusedWindow.webContents.send('req-save',{port:port,content:""});
+						if(path){
+							var array = path.split("/");
+							var filename = array[array.length - 1];
+							var port = ports[focusedWindow.id];
+							if(models[port]){
+								models[port].path = path;
+								focusedWindow.setRepresentedFilename(filename);
+								focusedWindow.setTitle(filename + " | TalkApp");
+								focusedWindow.webContents.send('req-save',{port:port,content:""});
+							}
 						}
 					});
         }
@@ -268,7 +291,26 @@ let menuTemplate = [{
         label: 'Quit',
         accelerator: 'CmdOrCtrl+Q',
         click: function(item, focusedWindow) {
-            app.quit();
+						var shouldAsk = false;
+						for(var i=0;i<models.length;i++){
+							if(models[i].window){
+								if(models[i].window.isDocumentEdited()){
+									shouldAsk = true;
+								}
+							}
+						}
+						if(shouldAsk){
+							var choice = dialog.showMessageBox(newWindow,{
+															type: 'question',
+															buttons: ['Yes', 'No'],
+															title: 'Confirm',
+															message: 'One talk is unsaved, do you really want to quit all ?'});
+							if(choice !== 1){
+								app.quit();
+							}
+						} else {
+							app.quit();
+						}
         }
     }]
 }, {
@@ -450,3 +492,15 @@ function writeFile(filePath, contents, currentWindow) {
 function error(type, message, currentWindow) {
 		console.log("ERROR",type,message);
 }
+
+//drag and drop management
+
+/*
+process.argv.forEach(onOpen);
+app.on('open-file', onOpen)
+app.on('open-url', onOpen)
+
+function onOpen(file){
+	console.log(">",file);
+}
+*/

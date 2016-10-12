@@ -1,0 +1,26 @@
+// ------------------------------------------------------------------
+// Basic
+// ------------------------------------------------------------------
+h1 {
+	margin-bottom:20px;
+	color:$grey;
+	font:bold 50px/1 Overpass-Light, sans-serif;
+	}
+
+h2 {
+	margin-bottom:20px;
+	color:$grey;
+	font:bold 35px/1 Overpass-Light, sans-serif;
+	}
+h3 {
+		margin-bottom:20px;
+		color:$grey;
+		font:bold 30px/1 Overpass-Light, sans-serif;
+		}
+
+p {
+	margin-bottom:1em;
+	&.note {
+		color:lighten($grey, 25%);
+		}
+	}

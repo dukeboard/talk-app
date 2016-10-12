@@ -1,0 +1,53 @@
+{
+  "name": "shower-ribbon",
+  "description": "Ribbon theme for Shower HTML presentation engine",
+  "version": "2.0.8",
+  "author": {
+    "name": "Vadim Makeev",
+    "url": "http://pepelsbey.net/"
+  },
+  "homepage": "https://github.com/shower/ribbon",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shower/ribbon.git"
+  },
+  "bugs": {
+    "url": "http://github.com/shower/shower/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "shower",
+    "presentation",
+    "ribbon",
+    "theme"
+  ],
+  "files": [
+    "docs/**",
+    "fonts/**",
+    "images/**",
+    "pictures/**",
+    "styles/*.css",
+    "index.html",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "devDependencies": {
+    "autoprefixer": "^6.4.0",
+    "browser-sync": "^2.14.0",
+    "gulp": "^3.9.1",
+    "gulp-header": "^1.8.8",
+    "gulp-postcss": "^6.1.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-sass": "^2.3.2",
+    "path-exists-cli": "^1.0.0",
+    "postcss-csso": "^1.1.2",
+    "shower-core": "^2.0.7"
+  },
+  "scripts": {
+    "dev": "gulp",
+    "styles": "gulp styles",
+    "prepublish": "npm run styles",
+    "test": "path-exists styles/screen-16x10.css && path-exists styles/screen-4x3.css"
+  }
+}

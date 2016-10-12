@@ -2,7 +2,10 @@
   "name": "Talk-app",
   "version": "0.1.0",
   "main": "main.js",
-  "devDependencies": {
-    "electron-packager": "^5.1.0"
+  "dependencies": {
+    "jquery": "*",
+    "golden-layout": "*",
+    "find-port":"*",
+    "highlight.js":"*"
   }
 }

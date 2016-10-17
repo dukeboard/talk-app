@@ -5,7 +5,11 @@
 .shower {
 	color:black;
 	counter-reset:slide;
-	font:25px Overpass, sans-serif;
+	font-family: 'robotoregular', sans-serif;
+	font-size: 25px;
+	//font-weight: normal;
+	line-height: 150%;
+
 	-webkit-print-color-adjust:exact;
 	-webkit-text-size-adjust:none;
 	-moz-text-size-adjust:none;

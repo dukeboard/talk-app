@@ -14,7 +14,7 @@
 	width:0;
 	height:0;
 	box-sizing:content-box;
-	border:$size solid $blue;
+	border:$size solid $grey-line;
 	border-right-color:transparent;
 	transition:width 0.2s linear;
 	clip:rect($size, $width + $size * 2, $size * 2, $size * 2);

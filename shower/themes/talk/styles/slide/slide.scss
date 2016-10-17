@@ -16,7 +16,7 @@
 	width:$width;
 	height:$height;
 	background:#FFF;
-	font-size:25px;
+	font-size:28px;
 	// Number
 
 	&::after {
@@ -66,6 +66,13 @@
 		}
 		i, em {
 			color: #777872;
+		}
+
+		h1 {
+			padding-bottom: 0.3em;
+		}
+		h2 {
+			padding-bottom: 0.2em;
 		}
 
 	}

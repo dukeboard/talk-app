@@ -6,22 +6,20 @@
 
 > Smart and efficient Keynote app from and for developers...
 
-
 - **Write**: your slide using plain markdown
 - **Preview**: it using the split layout
 - **Print**: it using pdf generator
-- **Share**: it using the `git`` friendly file format...
+- **Share**: it using the `git` friendly file format...
 
 ### How ?
 
 Simply use the HR tag as a slide separator
 
-```markdown
+``` sh
 ---
 ```
 
 ---
-
 # Powered by Electron !
 
 - Native integration
@@ -32,10 +30,14 @@ Simply use the HR tag as a slide separator
         - Print As Pdf
     - Use a classic .md format
 ---
+# Include images 
 
-# Powered by HTML
+![](images/eclipse.jpg =600x)
 
-![](images/eclipse.jpg) <!--{style="width:600px"}-->
+---
+# Include and position images 
+
+![](images/eclipse.jpg =600x) <!--{style="position:absolute;right:200px;top:200px"}-->
 
 ---
 # Highlight your code
@@ -138,6 +140,19 @@ This will be a orange **element** <!--{style="color:orange;"}-->
 
 This line will be a orange <!--{style="color:orange;"}-->
 
-This line will be a big !!! <!--{style="font-size: 50px"}-->
+This line will be big !!! <!--{style="font-size: 80px"}-->
 
 *and so on....*
+
+You can also ++underscore++ or ~~stroke~~ your text
+
+Then add some ==mark==
+
+Use some sub: H~2~0 or some sup: 29^th^
+
+Finally, you can also use font-awesome icons :fa-cog: and tune it **:fa-cog:** <!--{style="color:orange"}-->
+
+---
+<!--{.darkSlide}-->
+
+<h2 class="shout">See you <b>:-)</b></h2> 

@@ -9,12 +9,20 @@
         height:100%;
       }
     </style>
-		<link rel="stylesheet" href="shower/themes/talk/fonts/overpass/recommended.css">
+		<link rel="stylesheet" href="shower/themes/talk/fonts/roboto_light_macroman/stylesheet.css">
+		<link rel="stylesheet" href="font-awesome/css/font-awesome.css">
 		<script src="jquery.js"></script>
     <script src="goldenlayout.js"></script>
 		<script src="highlight/highlight.pack.js"></script>
 		<script src="markdown/markdown-it.min.js"></script>
 		<script src="markdown/decorate.js"></script>
+		<script src="markdown/ins.js"></script>
+		<script src="markdown/mark.js"></script>
+		<script src="markdown/sub.js"></script>
+		<script src="markdown/sup.js"></script>
+		<script src="markdown/img.js"></script>
+		<script src="markdown/icon.js"></script>
+		<script src="markdown/container.js"></script>
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-base.css" />
 		<link type="text/css" rel="stylesheet" href="node_modules/golden-layout/src/css/goldenlayout-light-theme.css" />
 		<link type="text/css" rel="stylesheet" href="shower/themes/talk/styles/screen-4x3.css" />
@@ -59,6 +67,26 @@
 		md.use(function attributes (md) {
   		md.core.ruler.push('curly_attributes', curlyAttrs)
 		});
+		md.use(window.markdownitIns);
+		md.use(window.markdownitMark);
+		md.use(window.markdownitSub);
+		md.use(window.markdownitSup);
+		md.use(window.markdownitIcon);
+		md.renderer.rules.emoji = function(tokens, idx) {
+		  var shortname = tokens[idx].markup;
+		  //if(shortname.startsWith('fa-')) { // fontawesome
+		    return '<span class="fa ' + shortname + '"></span>';
+		  //}
+		/*  if(shortname.startsWith('ion-')) { // ionicons
+		    return '<i class="' + shortname + '"></i>';
+		  }*/
+		  //return emojione.shortnameToImage(':' + shortname + ':'); // emojione
+		};
+		md.use(window['markdown-it-imsize.js'], { autofill: false });
+
+
+
+		//md.use(window.markdownitContainer);
 		/*
 		md.core.ruler.push('slideInit',function(tokens){
 			console.log(tokens)

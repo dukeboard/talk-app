@@ -6,15 +6,20 @@
 blockquote {
 
 	font-style:italic;
-	$border: hsl(0, 0%, 90%) !default;
-	border-left: 4px solid $border;
-	padding: 0.6em 1.2em;
-	font-size:22px;
+	$border: hsl(0, 0%, 80%) !default;
+	border-left: 5px solid $border;
+	padding: 0.2em 1.0em;
+	font-size:24px;
 	color:$grey;
+	margin-bottom: 1em;
+
+	p {
+		margin-bottom: 0px;
+	}
 
 	&::before {
 		position:absolute;
-		margin:-0.15em 0 0 -0.43em;
+		margin:-0.5em 0 0 -0.43em;
 		color:#CCC;
 		line-height:1;
 		font-size:8em;

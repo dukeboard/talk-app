@@ -26,8 +26,11 @@ const mimeType = {
 	'.svg': 'image/svg+xml',
 	'.pdf': 'application/pdf',
 	'.doc': 'application/msword',
-	'.eot': 'appliaction/vnd.ms-fontobject',
-	'.ttf': 'aplication/font-sfnt'
+	'.woff': 'application/font-woff',
+	'.ttf': 'application/font-sfnt',
+	'.svg': 'image/svg+xml',
+	'.otf': 'application/font-sfnt',
+	'.eot': 'application/vnd.ms-fontobject'
 };
 
 function createWindow () {
@@ -205,23 +208,25 @@ let menuTemplate = [{
         click: function(item, focusedWindow) {
             // Open a new file and either put it in the same window
             // or put it in a new window
-            selectFileDialog((files) => {
-                if (files != undefined) {
-									var port = ports[focusedWindow.id];
-									if(models[port]){
-										models[port].path = files;
-										var array = files.split("/");
-										filename = array[array.length - 1];
-										focusedWindow.setTitle(filename + " | TalkApp");
-										focusedWindow.setRepresentedFilename(filename);
-										focusedWindow.setDocumentEdited(false);
-										models[port].root = files.slice(0,files.length - (filename.length+1));
-										readFile(files, (content) => {
-												focusedWindow.webContents.send('file-contents', content);
-										},focusedWindow);
-									}
-                }
-            });
+						if(focusedWindow){
+	            selectFileDialog((files) => {
+	                if (files != undefined) {
+										var port = ports[focusedWindow.id];
+										if(models[port]){
+											models[port].path = files;
+											var array = files.split("/");
+											filename = array[array.length - 1];
+											focusedWindow.setTitle(filename + " | TalkApp");
+											focusedWindow.setRepresentedFilename(filename);
+											focusedWindow.setDocumentEdited(false);
+											models[port].root = files.slice(0,files.length - (filename.length+1));
+											readFile(files, (content) => {
+													focusedWindow.webContents.send('file-contents', content);
+											},focusedWindow);
+										}
+	                }
+	            });
+						}
         }
     }, {
         label: 'Save',
@@ -441,7 +446,7 @@ function selectFileDialog(callback) {
             extensions: ['md']
         }]
     }, function(file) {
-        if (file != undefined) {
+        if (file != undefined && file.length >0) {
             callback(file[0]);
         } else {
             callback(undefined);

@@ -12,6 +12,7 @@
 		<link rel="stylesheet" href="shower/themes/talk/fonts/roboto_light_macroman/stylesheet.css">
 		<link rel="stylesheet" href="font-awesome/css/font-awesome.css">
 		<script src="jquery.js"></script>
+		<script src="underscore-min.js"></script>
     <script src="goldenlayout.js"></script>
 		<script src="highlight/highlight.pack.js"></script>
 		<script src="markdown/markdown-it.min.js"></script>
@@ -101,6 +102,9 @@
 			if(trimmed.indexOf('<!--{.greenSlide}-->') === 0){
 				return '<section class=\"slide greenSlide\">'+contentResult+'</section>';
 			}
+			if(trimmed.indexOf('<!--{.darkBlueSlide}-->') === 0){
+				return '<section class=\"slide darkBlueSlide\">'+contentResult+'</section>';
+			}
 			if(trimmed.indexOf('<!--{.redSlide}-->') === 0){
 				return '<section class=\"slide redSlide\">'+contentResult+'</section>';
 			}
@@ -142,7 +146,6 @@
       }]
   };
   var myLayout = new GoldenLayout( config );
-
 	var slideContainer = document.createElement('div');
 	slideContainer.id = 'slideContainer';
   slideContainer.classList.add("shower");
@@ -157,7 +160,6 @@
 		});
 		container.getElement().append(slideContainer);
 		container.getElement().css("overflow","scroll");
-
 	});
 
   myLayout.registerComponent( 'editorPanel', function(container){
@@ -171,7 +173,13 @@
 				'# Hello',
 				'world'
 			].join('\n'),
-			language: 'markdown'
+			language: 'markdown',
+			wrappingColumn: 0,
+			wrappingIndent: "indent",
+			scrollbar: {
+				useShadows: false
+				//,verticalScrollbarSize: 10,
+			}
 		});
 		container.on('resize',function(){
 			editor.layout();
@@ -194,12 +202,10 @@
 			arg.content = mdProcess(editor.getValue());
 			remote.ipcRenderer.send('resp-print-content',arg);
 		});
-		editor.onDidChangeModelContent(function(){
-			if(!currentInject){
-				remote.ipcRenderer.send('edited');
-			}
+		var updateContent = _.debounce(function(e) {
 			slideContainer.innerHTML = mdProcess(editor.getValue());
-		});
+		}, 250);
+		editor.onDidChangeModelContent(updateContent);
 		slideContainer.innerHTML = mdProcess(editor.getValue());
 	});
   myLayout.init();

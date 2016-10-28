@@ -9,6 +9,7 @@ const portFinder = require('find-port');
 const http = require('http');
 const url = require('url');
 const path = require('path');
+const open = require('open');
 
 var models = {};
 var ports = {};
@@ -66,6 +67,8 @@ function createWindow () {
 								response.statusCode = 500;
 								response.end(`Error getting the file: ${err}.`);
 							} else {
+								response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0' );
+								response.setHeader('Pragma', 'no-cache' );
 								response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
 								response.end(data2);
 							}
@@ -78,9 +81,13 @@ function createWindow () {
 					if(request.url == '/full.html'||request.url == '/print.html'){
 						var dataString = data.toString();
 						dataString = dataString.replace('{content}',models[port].content);
+						response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0' );
+						response.setHeader('Pragma', 'no-cache' );
 						response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
 						response.end(dataString);
 					} else {
+						response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0' );
+						response.setHeader('Pragma', 'no-cache' );
 						response.setHeader('Content-type', mimeType[ext] || 'text/plain' );
 						response.end(data);
 					}
@@ -136,14 +143,18 @@ ipc.on('edited',function(){
 ipc.on('resp-content',function(event,eventData){
 	if(models[eventData.port]){
 		models[eventData.port].content = eventData.content;
-		var previewWindow = models[eventData.port].preview;
-		if(previewWindow){
-			previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/full.html`);
-			previewWindow.once('ready-to-show', () => {
-							previewWindow.setFullScreen(true);
-							previewWindow.maximize();
-							previewWindow.show();
-			});
+		if(eventData.external){
+				open('http://127.0.0.1:'+eventData.port+'/full.html');
+		} else {
+			var previewWindow = models[eventData.port].preview;
+			if(previewWindow){
+				previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/full.html`);
+				previewWindow.once('ready-to-show', () => {
+								previewWindow.setFullScreen(true);
+								previewWindow.maximize();
+								previewWindow.show();
+				});
+			}
 		}
 	}
 });
@@ -151,19 +162,23 @@ ipc.on('resp-content',function(event,eventData){
 ipc.on('resp-print-content',function(event,eventData){
 	if(models[eventData.port]){
 		models[eventData.port].content = eventData.content;
-		var previewWindow = models[eventData.port].preview;
-		if(previewWindow){
-			previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/print.html`);
-			previewWindow.once('ready-to-show', () => {
+		if(eventData.external){
+			open('http://127.0.0.1:'+eventData.port+'/print.html');
+		} else {
+			var previewWindow = models[eventData.port].preview;
+			if(previewWindow){
+				previewWindow.loadURL(`http://127.0.0.1:${eventData.port}/print.html`);
+				previewWindow.once('ready-to-show', () => {
 					previewWindow.webContents.printToPDF({
-			      landscape: true
-			    }, function(err, data) {
-			      fs.writeFile(eventData.path, data, function(err) {
-			        if(err) alert('genearte pdf error', err);
+						landscape: true
+					}, function(err, data) {
+						fs.writeFile(eventData.path, data, function(err) {
+							if(err) alert('genearte pdf error', err);
 							models[eventData.port].preview = undefined;
-			      });
-			    });
-			});
+						});
+					});
+				});
+			}
 		}
 	}
 });
@@ -274,7 +289,7 @@ let menuTemplate = [{
         accelerator: 'CmdOrCtrl+P',
         click: function(item, focusedWindow) {
             savePDFFileDialog(function(path){
-							if (focusedWindow) {
+							if (focusedWindow && path) {
 									var port = ports[focusedWindow.id];
 									if(port){
 										models[port].preview = new BrowserWindow({
@@ -350,7 +365,7 @@ let menuTemplate = [{
 }, {
     label: 'View',
     submenu: [{
-        label: 'Toggle Presentation Mode',
+        label: 'Open Presentation Mode',
         accelerator: (function() {
             if (process.platform === 'darwin') {
                 return 'Ctrl+Command+P';
@@ -379,6 +394,26 @@ let menuTemplate = [{
 								}
             }
         }
+    },{
+      type: 'separator'
+    },{
+        label: 'Open External View',
+        click: function(item, focusedWindow) {
+            if (focusedWindow) {
+								var port = ports[focusedWindow.id];
+								focusedWindow.webContents.send('req-content',{port:port,external:true});
+            }
+        }
+    },{
+        label: 'Open External Print',
+        click: function(item, focusedWindow) {
+            if (focusedWindow) {
+								var port = ports[focusedWindow.id];
+								focusedWindow.webContents.send('req-print-content',{port:port,external:true});
+            }
+        }
+    },{
+      type: 'separator'
     }, {
         label: 'Toggle Full Screen',
         accelerator: (function() {
@@ -499,7 +534,6 @@ function error(type, message, currentWindow) {
 }
 
 //drag and drop management
-
 /*
 process.argv.forEach(onOpen);
 app.on('open-file', onOpen)

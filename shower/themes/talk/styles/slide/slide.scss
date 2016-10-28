@@ -89,25 +89,53 @@
 }
 
 .greenSlide {
-		background:#0fa758;
-		color: #FFFFFF;
+		background:#33B490;
+		color: #FFF5E3;
+		em, i {
+			color: #464E70;
+		}
 		b, strong {
 			color: #fcde32;
 		}
 		h1,h2,h3 {
-			color: #FFFFFF;
+			color: #FFF5E3;
 		}
 		h4 {
-			color: #777872;
+			color: #464E70;
 		}
 		ol, ul {
 			li {
 				&::before {
-					color: #777872;
+					color: #464E70;
 				}
 			}
 		}
 }
+
+.darkBlueSlide {
+		background:#464E70;
+		color: #FFF5E3;
+		em, i {
+			color: #33B490;
+		}
+		b, strong {
+			color: #FF9003;
+		}
+		h1,h2,h3 {
+			color: #33B490;
+		}
+		h4 {
+			color: #33B490;
+		}
+		ol, ul {
+			li {
+				&::before {
+					color: #33B490;
+				}
+			}
+		}
+}
+
 
 .redSlide {
 		background:#db4441;

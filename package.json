@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "main": "main.js",
   "dependencies": {
-    "jquery": "*",
+    "find-port": "*",
     "golden-layout": "*",
-    "find-port":"*",
-    "highlight.js":"*"
+    "highlight.js": "*",
+    "jquery": "*",
+    "open": "0.0.5"
   }
 }
